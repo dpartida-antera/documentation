@@ -152,11 +152,15 @@ const SHIPFROM = {
   supplier:  "Supplier (provides product + decoration)"
 };
 function decideBlank(f){
+  if(f.alternateShipTo) return {a:"alternate"};
   if(!f.decorated){
-    if(f.alternateShipTo) return {a:"alternate"};
+    if(f.shipToUsUponCompletion){
+      if(f.destWarehouse) return {a:"warehouse"};
+      if(f.corpIdentity) return {a:"corpIdentity"};
+      return {a:"partner"};
+    }
     return {a:"order"};
   }
-  if(f.alternateShipTo) return {a:"alternate"};
   if(f.shipToUsInstead){
     if(f.destWarehouse) return {a:"warehouse"};
     if(f.corpIdentity) return {a:"corpIdentity"};
@@ -208,6 +212,12 @@ const SCEN = [
    order:"https://prd.anterasaas.com/e-commerce/orders/9ddab630-5aae-11f1-9447-0e9649c979d9"},
   {id:"A-08",sec:"A",title:"Customer Portal — Ship to Us on only one line item (split)",manualExpected:"Split shipment — the Ship-to-Us line goes to Us; the other line ships to the Decorator.",
    cond:["Customer Portal order","Decorated = No","Ship to Us Instead of Decorator = Yes (1 line item)"]},
+  {id:"A-09",sec:"A",title:"Not decorated, Ship to Us Upon Completion, Destination Warehouse",doc:"blank",flags:{decorated:false,shipToUsUponCompletion:true,destWarehouse:true},
+   cond:["Decorated = No","Alternate = No","Ship to Us Upon Completion = Yes","Destination Warehouse = Yes"]},
+  {id:"A-10",sec:"A",title:"Not decorated, Ship to Us Upon Completion, No Warehouse, Corporate Identity",doc:"blank",flags:{decorated:false,shipToUsUponCompletion:true,corpIdentity:true},
+   cond:["Decorated = No","Ship to Us Upon Completion = Yes","Destination Warehouse = No","Corporate Identity = Yes"]},
+  {id:"A-11",sec:"A",title:"Not decorated, Ship to Us Upon Completion, No Warehouse, No Corporate Identity",doc:"blank",flags:{decorated:false,shipToUsUponCompletion:true},
+   cond:["Decorated = No","Ship to Us Upon Completion = Yes","Destination Warehouse = No","Corporate Identity = No"]},
 
   // ---- B: Decorator PO ----
   {id:"B-01",sec:"B",title:"Alternate Ship To, No additional vendors",doc:"decorator",flags:{alternateShipTo:true},

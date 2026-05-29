@@ -91,7 +91,7 @@
             <tr><td><b>Decorated</b></td><td>The item has artwork/decoration applied.</td><td>Opens the decorator routing branch (Blank PO).</td></tr>
             <tr><td><b>Alternate Ship To</b></td><td>A specific override address was entered on the order.</td><td><b>Highest priority.</b> Sends the final PO to that address.</td></tr>
             <tr><td><b>Ship to Us Instead of Decorator</b></td><td>Route blanks back to your own location rather than to the decorator.</td><td>Triggers the “Ship to Us” branch on the Blank PO.</td></tr>
-            <tr><td><b>Ship to Us Upon Completion</b></td><td>After decoration finishes, route goods back to your location.</td><td>Triggers the “Ship to Us” branch on Decorator / Supplier Decorated POs.</td></tr>
+            <tr><td><b>Ship to Us Upon Completion</b></td><td>Route goods back to your location instead of out to the customer.</td><td>Triggers the “Ship to Us” branch on Decorator / Supplier Decorated POs — and on an <b>undecorated Blank PO</b>. (On a <i>decorated</i> Blank PO this does not apply; use “Ship to Us Instead of Decorator” there.)</td></tr>
             <tr><td><b>Destination Warehouse Setting</b></td><td>A warehouse is configured to receive “Ship to Us” goods.</td><td>Ship-to-Us goods go to the Destination Warehouse Address — <b>but only if the admin setting below is also On.</b></td></tr>
             <tr><td><b>Prioritize Warehouse Address on Ship To Us Toggles</b><br><span class="badge">Antera Admin Setting</span></td><td>A global admin toggle (Antera Admin Settings) that lets the Destination Warehouse address take over on any PO using a Ship-to-Us toggle.</td><td><b>Required for the Destination Warehouse override to work.</b> When OFF, a configured warehouse is ignored and routing falls through to Corporate Identity / Partner.</td></tr>
             <tr><td><b>Corporate Identity Assigned to Order</b></td><td>The order is tied to a Corporate Identity (branded account location).</td><td>Used as the Ship-to-Us address when no warehouse is set.</td></tr>
@@ -299,9 +299,10 @@ const TOGGLES = {
   blank: [
     {id:"decorated", label:"Decorated", sub:"Item has artwork applied"},
     {id:"alternateShipTo", label:"Alternate Ship To", sub:"Override address entered"},
-    {id:"shipToUsInstead", label:"Ship to Us Instead of Decorator", sub:"Route blanks back to us", dep:f=>f.decorated && !f.alternateShipTo},
-    {id:"destWarehouse", label:"Destination Warehouse Setting", sub:"Warehouse configured · needs Admin “Prioritize Warehouse Address on Ship To Us Toggles” = On", dep:f=>f.decorated && !f.alternateShipTo && f.shipToUsInstead},
-    {id:"corpIdentity", label:"Corporate Identity Assigned", sub:"Account corporate identity", dep:f=>f.decorated && !f.alternateShipTo && f.shipToUsInstead && !f.destWarehouse}
+    {id:"shipToUsUponCompletion", label:"Ship to Us Upon Completion", sub:"Return undecorated goods to us (applies only when NOT decorated)", dep:f=>!f.alternateShipTo && !f.decorated},
+    {id:"shipToUsInstead", label:"Ship to Us Instead of Decorator", sub:"Route blanks back to us instead of the decorator (decorated only)", dep:f=>!f.alternateShipTo && f.decorated},
+    {id:"destWarehouse", label:"Destination Warehouse Setting", sub:"Warehouse configured · needs Admin “Prioritize Warehouse Address on Ship To Us Toggles” = On", dep:f=>!f.alternateShipTo && ((!f.decorated && f.shipToUsUponCompletion) || (f.decorated && f.shipToUsInstead))},
+    {id:"corpIdentity", label:"Corporate Identity Assigned", sub:"Account corporate identity", dep:f=>!f.alternateShipTo && ((!f.decorated && f.shipToUsUponCompletion) || (f.decorated && f.shipToUsInstead)) && !f.destWarehouse}
   ],
   decorator: [
     {id:"additionalVendors", label:"Additional Decorations by Different Vendors", sub:"Item needs more than one decorator"},
@@ -330,11 +331,15 @@ const SHIPFROM = {
 
 /* ---------- Decision logic (mirrors source rules) ---------- */
 function decideBlank(f){
+  if(f.alternateShipTo) return {a:"alternate", p:["Alternate Ship To = Yes"]};
   if(!f.decorated){
-    if(f.alternateShipTo) return {a:"alternate", p:["Not decorated","Alternate Ship To = Yes"]};
-    return {a:"order", p:["Not decorated","No alternate / default flow"]};
+    if(f.shipToUsUponCompletion){
+      if(f.destWarehouse) return {a:"warehouse", p:["Not decorated","Ship to Us Upon Completion","Destination Warehouse = Yes"]};
+      if(f.corpIdentity) return {a:"corpIdentity", p:["Not decorated","Ship to Us Upon Completion","No warehouse","Corporate Identity = Yes"]};
+      return {a:"partner", p:["Not decorated","Ship to Us Upon Completion","No warehouse","No corporate identity"]};
+    }
+    return {a:"order", p:["Not decorated","No alternate","No Ship to Us","→ Customer"]};
   }
-  if(f.alternateShipTo) return {a:"alternate", p:["Decorated","Alternate Ship To = Yes"]};
   if(f.shipToUsInstead){
     if(f.destWarehouse) return {a:"warehouse", p:["Decorated","Ship to Us Instead of Decorator","Destination Warehouse = Yes"]};
     if(f.corpIdentity) return {a:"corpIdentity", p:["Decorated","Ship to Us Instead of Decorator","No warehouse","Corporate Identity = Yes"]};
@@ -465,33 +470,32 @@ function renderFlow(spec){
 }
 const FLOWSPEC = {
   blank: {
-    vb:[780,780],
+    vb:[880,760],
     nodes:[
-      {id:"start", x:20,  y:300, w:120, text:"Blank PO", type:"start"},
-      {id:"dec",   x:175, y:296, w:120, text:"Decorated?", type:"dec"},
-      {id:"naAlt", x:350, y:70,  w:140, text:"Alternate Ship To?", type:"dec"},
-      {id:"naAltA",x:575, y:30,  w:185, text:"Alternate Ship To Address", type:"end"},
-      {id:"naOrd", x:575, y:130, w:185, text:"Order Shipping Address", type:"end"},
-      {id:"dAlt",  x:350, y:360, w:140, text:"Alternate Ship To?", type:"dec"},
-      {id:"dAltA", x:575, y:340, w:185, text:"Alternate Ship To Address", type:"end"},
-      {id:"stu",   x:345, y:460, w:150, text:"Ship to Us Instead of Decorator?", type:"dec"},
-      {id:"first", x:575, y:468, w:185, text:"First Decorator Address", type:"end"},
-      {id:"dw",    x:350, y:565, w:140, text:"Destination Warehouse?", type:"dec"},
-      {id:"dwA",   x:575, y:567, w:185, text:"Destination Warehouse", type:"end"},
-      {id:"ci",    x:350, y:670, w:140, text:"Corporate Identity?", type:"dec"},
-      {id:"ciA",   x:575, y:658, w:185, text:"Corporate Identity Address", type:"end"},
-      {id:"partA", x:575, y:728, w:185, text:"Partner Address", type:"end"}
+      {id:"start", x:20,  y:60,  w:120, text:"Blank PO", type:"start"},
+      {id:"alt",   x:180, y:56,  w:150, text:"Alternate Ship To?", type:"dec"},
+      {id:"altA",  x:400, y:46,  w:185, text:"Alternate Ship To Address", type:"end"},
+      {id:"dec",   x:190, y:180, w:120, text:"Decorated?", type:"dec"},
+      {id:"stuUp", x:360, y:150, w:160, text:"Ship to Us Upon Completion?", type:"dec"},
+      {id:"ord",   x:600, y:128, w:185, text:"Order Shipping Address", type:"end"},
+      {id:"stuIn", x:175, y:320, w:165, text:"Ship to Us Instead of Decorator?", type:"dec"},
+      {id:"first", x:600, y:322, w:185, text:"First Decorator Address", type:"end"},
+      {id:"dw",    x:370, y:480, w:150, text:"Destination Warehouse?", type:"dec"},
+      {id:"dwA",   x:600, y:480, w:185, text:"Destination Warehouse", type:"end"},
+      {id:"ci",    x:370, y:600, w:150, text:"Corporate Identity?", type:"dec"},
+      {id:"ciA",   x:600, y:585, w:185, text:"Corporate Identity Address", type:"end"},
+      {id:"partA", x:600, y:670, w:185, text:"Partner Address", type:"end"}
     ],
     edges:[
-      {f:"start",t:"dec", from:"r", to:"l"},
-      {f:"dec", t:"naAlt", from:"t", to:"l", label:"no"},
-      {f:"naAlt",t:"naAltA", from:"t", to:"l", label:"yes"},
-      {f:"naAlt",t:"naOrd", from:"b", to:"l", label:"no"},
-      {f:"dec", t:"dAlt", from:"b", to:"l", label:"yes"},
-      {f:"dAlt",t:"dAltA", from:"r", to:"l", label:"yes"},
-      {f:"dAlt",t:"stu", from:"b", to:"t", label:"no"},
-      {f:"stu", t:"first", from:"r", to:"l", label:"no"},
-      {f:"stu", t:"dw", from:"b", to:"t", label:"yes"},
+      {f:"start",t:"alt", from:"r", to:"l"},
+      {f:"alt", t:"altA", from:"r", to:"l", label:"yes"},
+      {f:"alt", t:"dec", from:"b", to:"t", label:"no"},
+      {f:"dec", t:"stuUp", from:"r", to:"l", label:"no"},
+      {f:"dec", t:"stuIn", from:"b", to:"t", label:"yes"},
+      {f:"stuUp",t:"ord", from:"r", to:"l", label:"no"},
+      {f:"stuUp",t:"dw", from:"b", to:"t", label:"yes"},
+      {f:"stuIn",t:"first", from:"r", to:"l", label:"no"},
+      {f:"stuIn",t:"dw", from:"b", to:"l", label:"yes"},
       {f:"dw",  t:"dwA", from:"r", to:"l", label:"yes"},
       {f:"dw",  t:"ci", from:"b", to:"t", label:"no"},
       {f:"ci",  t:"ciA", from:"r", to:"l", label:"yes"},
@@ -575,6 +579,9 @@ const SCEN = [
   ["Blank PO","Decorated · Ship to Us Instead of Decorator · No warehouse · Corporate Identity","Corporate Identity Address"],
   ["Blank PO","Decorated · Ship to Us Instead of Decorator · No warehouse · No corporate identity","Partner Address"],
   ["Blank PO","Decorated · No Ship to Us","First Decorator Address"],
+  ["Blank PO","Not decorated · Ship to Us Upon Completion · Destination Warehouse","Destination Warehouse"],
+  ["Blank PO","Not decorated · Ship to Us Upon Completion · No warehouse · Corporate Identity","Corporate Identity Address"],
+  ["Blank PO","Not decorated · Ship to Us Upon Completion · No warehouse · No corporate identity","Partner Address"],
   ["Blank PO","Not decorated · No alternate · default flow","Order Shipping Address"],
   ["Blank PO","Cloned line item · same garment vendor · different decoration vendor","Decoration hands off in sequence: Supplier → First Decorator → Next Decorator → Customer"],
   ["Blank PO","Customer-portal order · same garment vendor · different decoration vendor","Same chain: Supplier → First Decorator → Next Decorator → Customer"],
