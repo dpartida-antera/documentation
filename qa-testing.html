@@ -153,7 +153,7 @@ const SHIPFROM = {
 };
 function decideBlank(f){
   if(!f.decorated){
-    if(f.alternateShipTo && f.shipToCustomer) return {a:"alternate"};
+    if(f.alternateShipTo) return {a:"alternate"};
     return {a:"order"};
   }
   if(f.alternateShipTo) return {a:"alternate"};
@@ -190,8 +190,8 @@ const SECTIONS = {
 };
 const SCEN = [
   // ---- A: Blank PO ----
-  {id:"A-01",sec:"A",title:"No decoration, Alternate Ship To, Ship to Customer",doc:"blank",flags:{decorated:false,alternateShipTo:true,shipToCustomer:true},
-   cond:["Decorated = No","Alternate Ship To = Yes","Ship to Customer = Yes"]},
+  {id:"A-01",sec:"A",title:"No decoration, Alternate Ship To",doc:"blank",flags:{decorated:false,alternateShipTo:true},
+   cond:["Decorated = No","Alternate Ship To = Yes"]},
   {id:"A-02",sec:"A",title:"Decorated, Ship to Us Instead of Decorator, Destination Warehouse",doc:"blank",flags:{decorated:true,shipToUsInstead:true,destWarehouse:true},
    cond:["Decorated = Yes","Alternate = No","Ship to Us Instead of Decorator = Yes","Destination Warehouse = Yes"],order:"https://prd.anterasaas.com/e-commerce/orders/dbd15176-5921-11f1-9447-0e9649c979d9"},
   {id:"A-03",sec:"A",title:"Decorated, Ship to Us, No Warehouse, Corporate Identity",doc:"blank",flags:{decorated:true,shipToUsInstead:true,corpIdentity:true},

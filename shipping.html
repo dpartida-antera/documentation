@@ -299,7 +299,6 @@ const TOGGLES = {
   blank: [
     {id:"decorated", label:"Decorated", sub:"Item has artwork applied"},
     {id:"alternateShipTo", label:"Alternate Ship To", sub:"Override address entered"},
-    {id:"shipToCustomer", label:"Ship to Customer", sub:"Only relevant when not decorated", dep:f=>!f.decorated && f.alternateShipTo},
     {id:"shipToUsInstead", label:"Ship to Us Instead of Decorator", sub:"Route blanks back to us", dep:f=>f.decorated && !f.alternateShipTo},
     {id:"destWarehouse", label:"Destination Warehouse Setting", sub:"Warehouse configured · needs Admin “Prioritize Warehouse Address on Ship To Us Toggles” = On", dep:f=>f.decorated && !f.alternateShipTo && f.shipToUsInstead},
     {id:"corpIdentity", label:"Corporate Identity Assigned", sub:"Account corporate identity", dep:f=>f.decorated && !f.alternateShipTo && f.shipToUsInstead && !f.destWarehouse}
@@ -332,7 +331,7 @@ const SHIPFROM = {
 /* ---------- Decision logic (mirrors source rules) ---------- */
 function decideBlank(f){
   if(!f.decorated){
-    if(f.alternateShipTo && f.shipToCustomer) return {a:"alternate", p:["Not decorated","Alternate Ship To = Yes","Ship to Customer = Yes"]};
+    if(f.alternateShipTo) return {a:"alternate", p:["Not decorated","Alternate Ship To = Yes"]};
     return {a:"order", p:["Not decorated","No alternate / default flow"]};
   }
   if(f.alternateShipTo) return {a:"alternate", p:["Decorated","Alternate Ship To = Yes"]};
@@ -571,7 +570,7 @@ showFlow("blank");
 
 /* ---------- Scenario library ---------- */
 const SCEN = [
-  ["Blank PO","Not decorated · Alternate Ship To · Ship to Customer","Alternate Ship To Address"],
+  ["Blank PO","Not decorated · Alternate Ship To","Alternate Ship To Address"],
   ["Blank PO","Decorated · Ship to Us Instead of Decorator · Destination Warehouse","Destination Warehouse"],
   ["Blank PO","Decorated · Ship to Us Instead of Decorator · No warehouse · Corporate Identity","Corporate Identity Address"],
   ["Blank PO","Decorated · Ship to Us Instead of Decorator · No warehouse · No corporate identity","Partner Address"],
