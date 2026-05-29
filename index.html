@@ -3,648 +3,80 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PO Shipping Address Guide — QA & Support Reference</title>
-<style>
-  :root{
-    --navy:#1f3a5f; --navy-2:#27496d; --blue:#2f6fb0; --blue-soft:#eaf2fb;
-    --accent:#0a7d5a; --accent-soft:#e6f4ee; --amber:#b07a1e; --amber-soft:#fbf3e0;
-    --ink:#1b2733; --muted:#5f6b7a; --line:#e2e8f0; --bg:#f5f7fa; --card:#ffffff;
-    --radius:12px; --shadow:0 1px 3px rgba(16,32,56,.08),0 4px 18px rgba(16,32,56,.06);
-  }
-  *{box-sizing:border-box}
-  html{scroll-behavior:smooth}
-  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    color:var(--ink);background:var(--bg);line-height:1.55;font-size:15.5px}
-  a{color:var(--blue);text-decoration:none}
-  a:hover{text-decoration:underline}
-  .wrap{display:grid;grid-template-columns:262px 1fr;max-width:1280px;margin:0 auto;gap:0}
-  /* Sidebar */
-  aside{position:sticky;top:0;align-self:start;height:100vh;overflow-y:auto;
-    background:var(--navy);color:#dbe6f2;padding:22px 18px 40px}
-  aside .brand{display:flex;align-items:center;gap:10px;margin-bottom:6px}
-  aside .brand .logo{width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,#3b82c4,#1f3a5f);
-    display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:18px}
-  aside .brand b{font-size:16px;color:#fff;letter-spacing:.2px}
-  aside .sub{font-size:12px;color:#9fb4cc;margin:0 0 18px 44px}
-  aside nav a{display:block;color:#c4d4e6;padding:7px 10px;border-radius:8px;font-size:13.5px;margin:1px 0}
-  aside nav a:hover{background:rgba(255,255,255,.07);text-decoration:none;color:#fff}
-  aside nav a.section{margin-top:14px;font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:#7e96b3;font-weight:700;padding-bottom:2px}
-  aside nav a.section:hover{background:none;color:#7e96b3;cursor:default}
-  /* Main */
-  main{padding:0 0 80px}
-  .hero{background:linear-gradient(135deg,var(--navy) 0%,var(--blue) 130%);color:#fff;padding:46px 48px 40px}
-  .hero h1{margin:0 0 8px;font-size:30px;letter-spacing:-.3px}
-  .hero p{margin:0;max-width:680px;color:#d7e4f3;font-size:16px}
-  .hero .pill{display:inline-block;margin-top:18px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);
-    padding:5px 13px;border-radius:30px;font-size:12.5px;color:#eaf2fb}
-  section{padding:34px 48px;border-bottom:1px solid var(--line)}
-  section h2{font-size:22px;margin:0 0 6px;color:var(--navy)}
-  section h2 .num{color:var(--blue);font-weight:800;margin-right:8px}
-  section .lead{color:var(--muted);margin:0 0 22px;max-width:760px}
-  h3{font-size:16.5px;color:var(--navy-2);margin:26px 0 10px}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
-  .grid{display:grid;gap:16px}
-  .g3{grid-template-columns:repeat(3,1fr)}
-  .g2{grid-template-columns:repeat(2,1fr)}
-  .doc-card{padding:18px 18px 16px}
-  .doc-card .tag{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--blue);background:var(--blue-soft);
-    display:inline-block;padding:3px 9px;border-radius:6px;margin-bottom:9px}
-  .doc-card h4{margin:0 0 6px;font-size:15.5px;color:var(--ink)}
-  .doc-card p{margin:0;color:var(--muted);font-size:13.5px}
-  table{width:100%;border-collapse:collapse;font-size:13.8px;background:var(--card);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
-  th,td{text-align:left;padding:11px 13px;border-bottom:1px solid var(--line);vertical-align:top}
-  th{background:var(--navy);color:#fff;font-weight:600;font-size:12.5px;letter-spacing:.3px}
-  tr:last-child td{border-bottom:none}
-  tbody tr:nth-child(even){background:#fafbfd}
-  code{background:#eef1f5;border:1px solid #e0e5ec;border-radius:5px;padding:1px 6px;font-size:12.8px;font-family:"SFMono-Regular",Consolas,monospace;color:#324}
-  .addr-chip{display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:13px;padding:3px 10px;border-radius:20px;background:var(--accent-soft);color:var(--accent);border:1px solid #bfe3d3}
-  .note{background:var(--amber-soft);border:1px solid #ecdcb4;border-left:4px solid var(--amber);border-radius:8px;padding:13px 16px;margin:18px 0;font-size:13.8px;color:#6b5418}
-  .note b{color:#5a4612}
-  .info{background:var(--blue-soft);border:1px solid #c9e0f6;border-left:4px solid var(--blue);border-radius:8px;padding:13px 16px;margin:18px 0;font-size:13.8px;color:#274b6d}
-  /* Decision tool */
-  .tool{display:grid;grid-template-columns:1fr 1fr;gap:0;overflow:hidden}
-  .tool .controls{padding:24px;border-right:1px solid var(--line)}
-  .tool .result{padding:24px;background:#fafbfd}
-  .seg{display:flex;gap:6px;background:#eef1f5;padding:5px;border-radius:10px;margin-bottom:20px}
-  .seg button{flex:1;border:none;background:transparent;padding:9px 6px;border-radius:7px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;transition:.15s}
-  .seg button.active{background:var(--card);color:var(--navy);box-shadow:0 1px 3px rgba(0,0,0,.12)}
-  .toggle-row{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--line)}
-  .toggle-row:last-child{border-bottom:none}
-  .toggle-row .lbl{font-size:13.8px}
-  .toggle-row .lbl small{display:block;color:var(--muted);font-size:11.5px;margin-top:1px}
-  .toggle-row.disabled{opacity:.4;pointer-events:none}
-  .sw{position:relative;width:44px;height:25px;flex:none}
-  .sw input{opacity:0;width:0;height:0}
-  .sw span{position:absolute;inset:0;background:#cbd5e1;border-radius:25px;transition:.2s;cursor:pointer}
-  .sw span:before{content:"";position:absolute;height:19px;width:19px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s}
-  .sw input:checked + span{background:var(--blue)}
-  .sw input:checked + span:before{transform:translateX(19px)}
-  .result .reslabel{font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);font-weight:700}
-  .result .resaddr{font-size:22px;font-weight:800;color:var(--accent);margin:8px 0 4px;line-height:1.2}
-  .result .ressource{font-size:13.5px;color:var(--muted);margin-bottom:16px}
-  .result .ressource b{color:var(--navy-2)}
-  .result .fieldbox{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
-  .result .fieldbox h5{margin:0 0 9px;font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--navy)}
-  .result .fieldbox ul{margin:0;padding-left:18px;columns:2;font-size:12.8px;color:#334}
-  .result .fieldbox li{margin:2px 0}
-  .result .path{margin-top:16px;font-size:12.5px;color:var(--muted)}
-  .result .path b{color:var(--navy-2)}
-  /* Flow diagrams */
-  .flowtabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
-  .flowtabs button{border:1px solid var(--line);background:var(--card);padding:8px 15px;border-radius:8px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer}
-  .flowtabs button.active{background:var(--navy);color:#fff;border-color:var(--navy)}
-  .flowwrap{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow);overflow-x:auto}
-  .flowwrap svg{display:block;min-width:760px;width:100%;height:auto}
-  /* Scenario filter */
-  .filterbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
-  .filterbar input{flex:1;min-width:220px;padding:10px 13px;border:1px solid var(--line);border-radius:9px;font-size:14px}
-  .filterbar select{padding:10px 13px;border:1px solid var(--line);border-radius:9px;font-size:13.5px;background:#fff}
-  .badge{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:5px;background:var(--blue-soft);color:var(--blue)}
-  .footer{padding:28px 48px;color:var(--muted);font-size:12.5px}
-  @media(max-width:880px){
-    .wrap{grid-template-columns:1fr}
-    aside{position:static;height:auto;display:none}
-    .tool,.g3,.g2{grid-template-columns:1fr}
-    .tool .controls{border-right:none;border-bottom:1px solid var(--line)}
-    section,.hero{padding-left:22px;padding-right:22px}
-  }
-</style>
+<title>Antera Documentation</title>
+<link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
-<div class="wrap">
-  <aside>
-    <div class="brand"><div class="logo">A</div><b>Antera</b></div>
-    <p class="sub">PO Shipping Reference</p>
-    <nav>
-      <a class="section">Understand</a>
-      <a href="#start">How shipping works</a>
-      <a href="#docs">The three PO documents</a>
-      <a href="#flags">Settings &amp; flags</a>
-      <a href="#addresses">Destination addresses</a>
-      <a href="#priority">Priority rules</a>
-      <a class="section">Use</a>
-      <a href="#tool">Address determination tool</a>
-      <a href="#flows">Decision flowcharts</a>
-      <a href="#scenarios">Scenario library</a>
-      <a class="section">Reference</a>
-      <a href="#fields">Field mapping</a>
-      <a href="#display">Display rules</a>
-      <a href="#glossary">Glossary</a>
-    </nav>
-  </aside>
+  <!-- Shared top bar -->
+  <div class="topbar">
+    <div class="brand"><div class="logo">A</div><b>Antera Documentation</b><span>· Knowledge base</span></div>
+    <div class="spacer"></div>
+    <a class="barlink" href="index.html">Home</a>
+  </div>
 
-  <main>
-    <div class="hero">
-      <h1>PO Shipping Address Guide</h1>
-      <p>How the system decides <i>where every purchase order ships</i> — written for QA and Support. Start with the mental model, then use the interactive tool to confirm any case in seconds.</p>
-      <span class="pill">Intended behavior reference · Standard &amp; Store orders</span>
+  <div class="hub-hero">
+    <div class="inner">
+      <h1>Antera Documentation</h1>
+      <p>Internal reference for QA and Support. Pick a guide below. Each one explains how a part of the system is <i>supposed</i> to work, with searchable references and tools to confirm any case quickly.</p>
+    </div>
+  </div>
+
+  <div class="hub-main">
+    <div class="hub-section-title"><h2>Guides</h2><div class="rule"></div></div>
+    <div class="doc-grid">
+
+      <!-- LIVE: Shipping -->
+      <a class="doc-tile" href="shipping.html">
+        <div class="ic">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 3h15v13H1z"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+        </div>
+        <h3>PO Shipping Address Guide</h3>
+        <p>How the system decides where every purchase order ships — documents, flags, the seven destination addresses, and an interactive determination tool.</p>
+        <div class="meta"><span class="status live">Live</span> · QA &amp; Support</div>
+      </a>
+
+      <!-- ============================================================
+           TO ADD A NEW GUIDE:
+           1. Copy one <a class="doc-tile"> block above.
+           2. Point href to your new page (e.g. "returns.html").
+           3. Update the icon, title, description, and status.
+           Use status "soon" for placeholders (see examples below).
+           ============================================================ -->
+
+      <!-- PLACEHOLDER examples — replace or delete -->
+      <div class="doc-tile placeholder">
+        <div class="ic" style="background:#f0f1f4;color:#8895a8">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-6l-2-2H5a2 2 0 0 0-2 2z"/></svg>
+        </div>
+        <h3>Returns &amp; RMA</h3>
+        <p>Placeholder — how returns, credits, and replacements flow through the system.</p>
+        <div class="meta"><span class="status soon">Planned</span></div>
+      </div>
+
+      <div class="doc-tile placeholder">
+        <div class="ic" style="background:#f0f1f4;color:#8895a8">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        </div>
+        <h3>Pricing &amp; Discounts</h3>
+        <p>Placeholder — order pricing, margins, discount rules, and rounding behavior.</p>
+        <div class="meta"><span class="status soon">Planned</span></div>
+      </div>
+
+      <!-- Add-new tile -->
+      <div class="doc-tile add">
+        <div class="plus">+</div>
+        <div>Add a guide by copying a tile<br>and creating its <code>.html</code> page</div>
+      </div>
+
     </div>
 
-    <!-- START -->
-    <section id="start">
-      <h2><span class="num">01</span>How shipping works, in one minute</h2>
-      <p class="lead">Every order is broken into one or more <b>Purchase Orders (POs)</b>. Each PO is a document telling one party to send goods somewhere. The system answers a single question for each PO: <b>“What address goes in the Ship&nbsp;To block?”</b></p>
-      <div class="info">
-        <b>The whole system is just three inputs feeding one decision.</b><br>
-        1) <b>Which document</b> is this? (Blank PO, Decorator PO, or Supplier Decorated PO) &nbsp;→&nbsp;
-        2) <b>Which flags</b> are set on the order/product? &nbsp;→&nbsp;
-        3) The system walks a <b>decision tree</b> and picks one of seven possible <b>destination addresses</b>.
-      </div>
-      <p>The goal is to route product through the right hands: a blank garment may need to reach a decorator before it reaches the customer; a finished item may go straight to the buyer; sometimes everything routes back to your own warehouse first. The flags below are how a CSR expresses that intent, and this guide is how you confirm the system honored it.</p>
-    </section>
-
-    <!-- DOCS -->
-    <section id="docs">
-      <h2><span class="num">02</span>The three PO documents</h2>
-      <p class="lead">A single order can generate more than one of these. They each follow their own decision tree because they sit at different points in the production chain.</p>
-      <div class="grid g3">
-        <div class="card doc-card">
-          <span class="tag">Blank PO</span>
-          <h4>Undecorated goods from a supplier</h4>
-          <p>Orders blank product from the blank supplier. If the item is decorated, the blank usually has to reach a decorator before going anywhere else.</p>
-        </div>
-        <div class="card doc-card">
-          <span class="tag">Decorator PO</span>
-          <h4>Sends work to a decorator</h4>
-          <p>Goes to the vendor doing the decoration (embroidery, print, etc.) when decoration is done by a <i>different</i> vendor than the blank supplier.</p>
-        </div>
-        <div class="card doc-card">
-          <span class="tag">Supplier Decorated PO</span>
-          <h4>Supplier also decorates</h4>
-          <p>Used when the product and its decoration come from the <i>same</i> supplier. Follows the same address logic as a Decorator PO.</p>
-        </div>
-      </div>
-      <div class="note"><b>Multi-decoration chains:</b> when an item carries decorations from several vendors, POs hand off in sequence — Supplier → Decorator 1 → Decorator 2 → … → final destination. Only the <b>final</b> PO in the chain ships to the customer (or Alternate address); every earlier PO ships to the <i>next</i> decorator.</div>
-    </section>
-
-    <!-- FLAGS -->
-    <section id="flags">
-      <h2><span class="num">03</span>Settings &amp; flags that drive the decision</h2>
-      <p class="lead">These are the toggles a CSR sets on the order, product, or partner configuration. Each one can redirect where a PO ships.</p>
-      <table>
-        <thead><tr><th style="width:230px">Flag</th><th>What it means</th><th style="width:200px">Effect when ON</th></tr></thead>
-        <tbody>
-          <tr><td><b>Decorated</b></td><td>The item has artwork/decoration applied.</td><td>Opens the decorator routing branch (Blank PO).</td></tr>
-          <tr><td><b>Alternate Ship To</b></td><td>A specific override address was entered on the order.</td><td><b>Highest priority.</b> Sends the final PO to that address.</td></tr>
-          <tr><td><b>Ship to Us Instead of Decorator</b></td><td>Route blanks back to your own location rather than to the decorator.</td><td>Triggers the “Ship to Us” branch on the Blank PO.</td></tr>
-          <tr><td><b>Ship to Us Upon Completion</b></td><td>After decoration finishes, route goods back to your location.</td><td>Triggers the “Ship to Us” branch on Decorator / Supplier Decorated POs.</td></tr>
-          <tr><td><b>Destination Warehouse Setting</b></td><td>A warehouse is configured to receive “Ship to Us” goods.</td><td>Ship-to-Us goods go to the Destination Warehouse Address.</td></tr>
-          <tr><td><b>Corporate Identity Assigned to Order</b></td><td>The order is tied to a Corporate Identity (branded account location).</td><td>Used as the Ship-to-Us address when no warehouse is set.</td></tr>
-          <tr><td><b>Additional Decorations by Different Vendors</b></td><td>The item needs more than one decorator.</td><td>Creates the multi-vendor chain; non-final POs ship to the next decorator.</td></tr>
-        </tbody>
-      </table>
-    </section>
-
-    <!-- ADDRESSES -->
-    <section id="addresses">
-      <h2><span class="num">04</span>The seven destination addresses</h2>
-      <p class="lead">Every decision ends at exactly one of these. Knowing the <b>source</b> of each is what lets you verify the address block field-by-field.</p>
-      <table>
-        <thead><tr><th style="width:300px">Destination</th><th>Source of the data</th></tr></thead>
-        <tbody>
-          <tr><td><span class="addr-chip">Order Shipping Address</span></td><td>The customer address on the <b>Order</b> (the default end destination).</td></tr>
-          <tr><td><span class="addr-chip">Alternate Ship To Address</span></td><td>The override address typed into the <b>Alternate Ship To</b> fields.</td></tr>
-          <tr><td><span class="addr-chip">First Decorator Address</span></td><td>The shipping address of the <b>first decorator vendor</b>.</td></tr>
-          <tr><td><span class="addr-chip">Second &amp; Beyond Decorator</span></td><td>The shipping address of the <b>next decorator</b> in a multi-vendor chain.</td></tr>
-          <tr><td><span class="addr-chip">Destination Warehouse</span></td><td>The configured <b>Destination Warehouse</b> address.</td></tr>
-          <tr><td><span class="addr-chip">Corporate Identity Address</span></td><td>The <b>Corporate Identity</b> shipping address on the account.</td></tr>
-          <tr><td><span class="addr-chip">Partner Address</span></td><td>Your own <b>Partner Company</b> address (system default for Ship to Us).</td></tr>
-        </tbody>
-      </table>
-      <div class="info">A <b>Supplier PO</b> in a standard “ship to decorator” flow ships <i>from the Vendor</i> — its address block is sourced from the Vendor record, not from the list above.</div>
-    </section>
-
-    <!-- PRIORITY -->
-    <section id="priority">
-      <h2><span class="num">05</span>Priority rules (conflict resolution)</h2>
-      <p class="lead">When more than one flag is set, the system resolves conflicts in a fixed order. This single rule explains most “why did it ship there?” questions.</p>
-      <div class="grid g3">
-        <div class="card doc-card"><span class="tag">1 · Highest</span><h4>Alternate Ship To</h4><p>If an Alternate address is set, it wins over Ship-to-Us and default routing on the final PO.</p></div>
-        <div class="card doc-card"><span class="tag">2</span><h4>Ship to Us settings</h4><p>If no Alternate address, Ship-to-Us routing (warehouse → corporate identity → partner) applies.</p></div>
-        <div class="card doc-card"><span class="tag">3 · Default</span><h4>Vendor / Order</h4><p>With no overrides, the Supplier PO ships from Vendor and the Decorator PO ships to the Order address.</p></div>
-      </div>
-      <div class="note"><b>Within “Ship to Us,” there is a sub-priority:</b> Destination Warehouse → then Corporate Identity → then Partner Address. The system takes the first one that is configured.</div>
-    </section>
-
-    <!-- TOOL -->
-    <section id="tool">
-      <h2><span class="num">06</span>Address determination tool</h2>
-      <p class="lead">Pick a document, flip the flags as they appear on the order, and the tool shows the exact destination, its data source, and the fields you should see in the address block. This mirrors the system’s decision rules.</p>
-      <div class="card tool">
-        <div class="controls">
-          <div class="seg" id="seg">
-            <button data-doc="blank" class="active">Blank PO</button>
-            <button data-doc="decorator">Decorator PO</button>
-            <button data-doc="supplier">Supplier Decorated PO</button>
-          </div>
-          <div id="toggles"></div>
-        </div>
-        <div class="result">
-          <div class="reslabel">Ships to</div>
-          <div class="resaddr" id="resAddr">—</div>
-          <div class="ressource" id="resSource"></div>
-          <div class="fieldbox">
-            <h5>Expected address-block fields</h5>
-            <ul id="resFields"></ul>
-          </div>
-          <div class="path" id="resPath"></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- FLOWS -->
-    <section id="flows">
-      <h2><span class="num">07</span>Decision flowcharts</h2>
-      <p class="lead">The same logic the tool uses, drawn out. Diamonds are flag checks; green boxes are destinations.</p>
-      <div class="flowtabs" id="flowtabs">
-        <button data-flow="blank" class="active">Blank PO</button>
-        <button data-flow="decorator">Decorator PO</button>
-        <button data-flow="supplier">Supplier Decorated PO</button>
-      </div>
-      <div class="flowwrap" id="flowwrap"></div>
-    </section>
-
-    <!-- SCENARIOS -->
-    <section id="scenarios">
-      <h2><span class="num">08</span>Scenario library</h2>
-      <p class="lead">Worked examples of intended behavior. Search by keyword or filter by document to confirm what <i>should</i> happen for a given flag combination.</p>
-      <div class="filterbar">
-        <input type="text" id="scenSearch" placeholder="Search scenarios — e.g. “warehouse”, “corporate identity”, “alternate”…">
-        <select id="scenFilter">
-          <option value="all">All documents</option>
-          <option value="Blank PO">Blank PO</option>
-          <option value="Decorator PO">Decorator PO</option>
-          <option value="Supplier Decorated PO">Supplier Decorated PO</option>
-          <option value="Store Order">Store Order</option>
-        </select>
-      </div>
-      <table>
-        <thead><tr><th style="width:120px">Document</th><th>Conditions</th><th style="width:260px">Ships to</th></tr></thead>
-        <tbody id="scenBody"></tbody>
-      </table>
-    </section>
-
-    <!-- FIELDS -->
-    <section id="fields">
-      <h2><span class="num">09</span>Field mapping reference</h2>
-      <p class="lead">The exact field names populated in the address block, by source. Use this when an address looks wrong — confirm each field traces back to the right source record.</p>
-
-      <h3>Order source — Ship to Customer (Standard order)</h3>
-      <p style="margin:0 0 8px;color:var(--muted);font-size:13.5px">Used for the default Order Shipping Address.</p>
-      <table><tbody>
-        <tr><td><code>shippingCustomerName</code></td><td><code>shippingCompanyName</code></td><td><code>shippingCustomerEmail</code></td></tr>
-        <tr><td><code>shippingStreet</code></td><td><code>shippingStreet2</code> <span class="badge">conditional</span></td><td><code>shippingCity</code></td></tr>
-        <tr><td><code>shippingState</code></td><td><code>shippingPostalCode</code></td><td><code>shippingCountry</code></td></tr>
-        <tr><td><code>shippingPhone</code> <span class="badge">conditional</span></td><td></td><td></td></tr>
-      </tbody></table>
-
-      <h3>Vendor source — Supplier PO ships to decorator</h3>
-      <table><tbody>
-        <tr><td><code>accountName</code></td><td><code>email</code></td><td><code>shipAddress1</code></td></tr>
-        <tr><td><code>shipAddress2</code> <span class="badge">conditional</span></td><td><code>shipCity</code></td><td><code>shipState</code></td></tr>
-        <tr><td><code>shipPostalCode</code></td><td><code>shipCountry</code></td><td></td></tr>
-      </tbody></table>
-
-      <h3>Alternate Ship To source</h3>
-      <table><tbody>
-        <tr><td><code>accountName</code></td><td><code>email</code></td><td><code>shipAddress1</code></td></tr>
-        <tr><td><code>shipAddress2</code> <span class="badge">conditional</span></td><td><code>shipCity</code></td><td><code>shipState</code></td></tr>
-        <tr><td><code>shipPostalCode</code></td><td><code>shipCountry</code></td><td><code>shipPhone</code> <span class="badge">conditional</span></td></tr>
-      </tbody></table>
-
-      <h3>Partner Company source — Ship to Us, no Corporate Identity</h3>
-      <table><tbody>
-        <tr><td><code>Partner Company</code></td><td><code>Partner Address</code></td><td><code>Partner Address 2</code> <span class="badge">conditional</span></td></tr>
-        <tr><td><code>Partner City</code></td><td><code>Partner State</code></td><td><code>Partner Postal Code</code></td></tr>
-        <tr><td><code>Partner Country</code></td><td><code>Partner Phone</code></td><td></td></tr>
-      </tbody></table>
-
-      <h3>Corporate Identity source — Ship to Us, Corporate Identity used</h3>
-      <table><tbody>
-        <tr><td><code>Corporate Identity Name</code></td><td><code>Shipping Street</code></td><td><code>Shipping City</code></td></tr>
-        <tr><td><code>Shipping State</code></td><td><code>Shipping Postal Code</code></td><td><code>Shipping Country</code></td></tr>
-        <tr><td><code>Phone</code></td><td></td><td></td></tr>
-      </tbody></table>
-
-      <h3>Order source — Ship to Store Customer (Store order)</h3>
-      <table><tbody>
-        <tr><td><code>storeShippingAttentionTo</code></td><td><code>storeShippingCompanyName</code></td><td><code>storeShippingContactEmail</code></td></tr>
-        <tr><td><code>shippingStreet</code></td><td><code>shippingStreet2</code> <span class="badge">conditional</span></td><td><code>shippingCity</code></td></tr>
-        <tr><td><code>shippingState</code></td><td><code>shippingPostalCode</code></td><td><code>shippingCountry</code></td></tr>
-        <tr><td><code>shippingPhone</code> <span class="badge">conditional</span></td><td></td><td></td></tr>
-      </tbody></table>
-      <div class="info"><b>Store orders</b> follow the exact same routing logic as standard orders — only the customer-facing field names differ (the <code>store…</code> prefixed fields above).</div>
-    </section>
-
-    <!-- DISPLAY -->
-    <section id="display">
-      <h2><span class="num">10</span>Field display rules</h2>
-      <p class="lead">How individual fields render on the printed/visible PO regardless of source.</p>
-      <table>
-        <thead><tr><th style="width:220px">Field</th><th>Rule</th></tr></thead>
-        <tbody>
-          <tr><td><b>Address Line 2</b><br><code>shipAddress2 / shippingStreet2</code></td><td>Display only when a value is present. When empty/null, the field is <b>omitted entirely</b> — no blank line.</td></tr>
-          <tr><td><b>Phone</b><br><code>shippingPhone / shipPhone</code></td><td>Display only when a value is present; otherwise omitted entirely.</td></tr>
-          <tr><td><b>Email</b></td><td>Display whenever it is available from the source.</td></tr>
-        </tbody>
-      </table>
-      <div class="note"><b>QA tip:</b> a missing Address Line 2 or Phone is <i>expected</i> when the source has no value — it should never render as an empty line. Treat a blank placeholder line as a defect.</div>
-    </section>
-
-    <!-- GLOSSARY -->
-    <section id="glossary">
-      <h2><span class="num">11</span>Glossary</h2>
-      <table><tbody>
-        <tr><td style="width:230px"><b>PO (Purchase Order)</b></td><td>A document instructing one party to supply/decorate/ship goods. One order can spawn several.</td></tr>
-        <tr><td><b>Blank / Blank Supplier</b></td><td>Undecorated product and the vendor that provides it.</td></tr>
-        <tr><td><b>Decorator</b></td><td>The vendor that applies artwork (embroidery, screen print, etc.).</td></tr>
-        <tr><td><b>Final / Final Decorator PO</b></td><td>The last PO in a decoration chain — the one that ships to the customer or Alternate address.</td></tr>
-        <tr><td><b>Ship to Us</b></td><td>Routing goods back to your own location (warehouse → corporate identity → partner) instead of onward.</td></tr>
-        <tr><td><b>Corporate Identity</b></td><td>A branded account-specific shipping location used for Ship-to-Us when no warehouse is set.</td></tr>
-        <tr><td><b>Partner Address</b></td><td>Your own company's default address — the final fallback for Ship-to-Us.</td></tr>
-        <tr><td><b>Alternate Ship To</b></td><td>A one-off override address entered on the order; highest routing priority.</td></tr>
-      </tbody></table>
-    </section>
-
-    <div class="footer">
-      PO Shipping Address Guide · QA &amp; Support reference · Describes intended system behavior.
-      Source of truth: Shipping Field Mapping, PO Shipping Display Rules, and PO Document Shipping Address Determination.
+    <div class="hub-howto">
+      <b>How this project is organized.</b> Every guide is its own self-contained page that shares <code>assets/styles.css</code>, so they all look and behave the same. To add one: copy <code>shipping.html</code> as a starting template, replace the content, then add a tile on this page pointing to it. The site works as-is on GitHub Pages — <code>index.html</code> is the landing page.
     </div>
-  </main>
-</div>
+  </div>
 
-<script>
-/* ---------- Address metadata ---------- */
-const ADDR = {
-  order:        {name:"Order Shipping Address", source:"Order — customer address on the order", fields:["shippingCustomerName","shippingCompanyName","shippingCustomerEmail","shippingStreet","shippingStreet2 (cond.)","shippingCity","shippingState","shippingPostalCode","shippingCountry","shippingPhone (cond.)"]},
-  alternate:    {name:"Alternate Ship To Address", source:"Alternate Ship To override fields", fields:["accountName","email","shipAddress1","shipAddress2 (cond.)","shipCity","shipState","shipPostalCode","shipCountry","shipPhone (cond.)"]},
-  firstDecorator:{name:"First Decorator Address", source:"First decorator vendor's shipping address", fields:["accountName","email","shipAddress1","shipAddress2 (cond.)","shipCity","shipState","shipPostalCode","shipCountry"]},
-  secondBeyond: {name:"Second & Beyond Decorator", source:"Next decorator vendor in the chain (final PO shows Alternate / Order)", fields:["accountName","email","shipAddress1","shipAddress2 (cond.)","shipCity","shipState","shipPostalCode","shipCountry"]},
-  warehouse:    {name:"Destination Warehouse", source:"Configured Destination Warehouse address", fields:["Warehouse Name","Address 1","Address 2 (cond.)","City","State","Postal Code","Country","Phone"]},
-  corpIdentity: {name:"Corporate Identity Address", source:"Corporate Identity on the account", fields:["Corporate Identity Name","Shipping Street","Shipping City","Shipping State","Shipping Postal Code","Shipping Country","Phone"]},
-  partner:      {name:"Partner Address", source:"System — your Partner Company record", fields:["Partner Company","Partner Address","Partner Address 2 (cond.)","Partner City","Partner State","Partner Postal Code","Partner Country","Partner Phone"]}
-};
-
-/* ---------- Toggle definitions per document ---------- */
-const TOGGLES = {
-  blank: [
-    {id:"decorated", label:"Decorated", sub:"Item has artwork applied"},
-    {id:"alternateShipTo", label:"Alternate Ship To", sub:"Override address entered"},
-    {id:"shipToCustomer", label:"Ship to Customer", sub:"Only relevant when not decorated", dep:f=>!f.decorated && f.alternateShipTo},
-    {id:"shipToUsInstead", label:"Ship to Us Instead of Decorator", sub:"Route blanks back to us", dep:f=>f.decorated && !f.alternateShipTo},
-    {id:"destWarehouse", label:"Destination Warehouse Setting", sub:"Warehouse configured", dep:f=>f.decorated && !f.alternateShipTo && f.shipToUsInstead},
-    {id:"corpIdentity", label:"Corporate Identity Assigned", sub:"Account corporate identity", dep:f=>f.decorated && !f.alternateShipTo && f.shipToUsInstead && !f.destWarehouse}
-  ],
-  decorator: [
-    {id:"alternateShipTo", label:"Alternate Ship To", sub:"Override address entered"},
-    {id:"additionalVendors", label:"Additional Decorations by Different Vendors", sub:"Multi-vendor chain"},
-    {id:"isFinalPO", label:"This is the FINAL Decorator PO", sub:"Last PO in the chain", dep:f=>f.additionalVendors},
-    {id:"shipToUsUponCompletion", label:"Ship to Us Upon Completion", sub:"Return to us after decoration", dep:f=>!f.alternateShipTo},
-    {id:"destWarehouse", label:"Destination Warehouse Setting", sub:"Warehouse configured", dep:f=>!f.alternateShipTo && f.shipToUsUponCompletion},
-    {id:"corpIdentity", label:"Corporate Identity Assigned", sub:"Account corporate identity", dep:f=>!f.alternateShipTo && f.shipToUsUponCompletion && !f.destWarehouse}
-  ],
-  supplier: [
-    {id:"alternateShipTo", label:"Alternate Ship To", sub:"Override address entered"},
-    {id:"additionalVendors", label:"Additional Decorations by Different Vendors", sub:"Multi-vendor chain"},
-    {id:"isFinalPO", label:"This is the FINAL PO", sub:"Last PO in the chain", dep:f=>f.additionalVendors},
-    {id:"shipToUsUponCompletion", label:"Ship to Us Upon Completion", sub:"Return to us after decoration", dep:f=>!f.alternateShipTo},
-    {id:"destWarehouse", label:"Destination Warehouse Setting", sub:"Warehouse configured", dep:f=>!f.alternateShipTo && f.shipToUsUponCompletion},
-    {id:"corpIdentity", label:"Corporate Identity Assigned", sub:"Account corporate identity", dep:f=>!f.alternateShipTo && f.shipToUsUponCompletion && !f.destWarehouse}
-  ]
-};
-
-/* ---------- Decision logic (mirrors source rules) ---------- */
-function decideBlank(f){
-  if(!f.decorated){
-    if(f.alternateShipTo && f.shipToCustomer) return {a:"alternate", p:["Not decorated","Alternate Ship To = Yes","Ship to Customer = Yes"]};
-    return {a:"order", p:["Not decorated","No alternate / default flow"]};
-  }
-  if(f.alternateShipTo) return {a:"alternate", p:["Decorated","Alternate Ship To = Yes"]};
-  if(f.shipToUsInstead){
-    if(f.destWarehouse) return {a:"warehouse", p:["Decorated","Ship to Us Instead of Decorator","Destination Warehouse = Yes"]};
-    if(f.corpIdentity) return {a:"corpIdentity", p:["Decorated","Ship to Us Instead of Decorator","No warehouse","Corporate Identity = Yes"]};
-    return {a:"partner", p:["Decorated","Ship to Us Instead of Decorator","No warehouse","No corporate identity"]};
-  }
-  return {a:"firstDecorator", p:["Decorated","No alternate","No Ship to Us"]};
-}
-function decideChain(f){ // decorator + supplier decorated share this
-  if(f.alternateShipTo){
-    if(!f.additionalVendors) return {a:"alternate", p:["Alternate Ship To = Yes","No additional vendors"]};
-    return f.isFinalPO ? {a:"alternate", p:["Alternate Ship To = Yes","Additional vendors","This is the final PO"]}
-                       : {a:"secondBeyond", p:["Alternate Ship To = Yes","Additional vendors","Not the final PO"]};
-  }
-  if(f.shipToUsUponCompletion){
-    if(f.destWarehouse) return {a:"warehouse", p:["No alternate","Ship to Us Upon Completion","Destination Warehouse = Yes"]};
-    if(f.corpIdentity) return {a:"corpIdentity", p:["No alternate","Ship to Us Upon Completion","No warehouse","Corporate Identity = Yes"]};
-    return {a:"partner", p:["No alternate","Ship to Us Upon Completion","No warehouse","No corporate identity"]};
-  }
-  return {a:"order", p:["No alternate","No Ship to Us"]};
-}
-
-let state = {doc:"blank", flags:{}};
-function decide(){
-  const f = state.flags;
-  if(state.doc==="blank") return decideBlank(f);
-  return decideChain(f);
-}
-
-function renderToggles(){
-  const host = document.getElementById("toggles");
-  host.innerHTML = "";
-  TOGGLES[state.doc].forEach(t=>{
-    const active = !t.dep || t.dep(state.flags);
-    const row = document.createElement("div");
-    row.className = "toggle-row" + (active?"":" disabled");
-    row.innerHTML = `<div class="lbl">${t.label}<small>${t.sub}</small></div>
-      <label class="sw"><input type="checkbox" ${state.flags[t.id]?"checked":""} ${active?"":"disabled"}><span></span></label>`;
-    row.querySelector("input").addEventListener("change", e=>{
-      state.flags[t.id] = e.target.checked;
-      renderToggles(); renderResult();
-    });
-    host.appendChild(row);
-  });
-}
-function renderResult(){
-  const r = decide();
-  const a = ADDR[r.a];
-  document.getElementById("resAddr").textContent = a.name;
-  document.getElementById("resSource").innerHTML = "Source: <b>"+a.source+"</b>";
-  document.getElementById("resFields").innerHTML = a.fields.map(x=>"<li>"+x+"</li>").join("");
-  document.getElementById("resPath").innerHTML = "<b>Why:</b> " + r.p.join(" → ");
-}
-document.getElementById("seg").addEventListener("click", e=>{
-  if(e.target.tagName!=="BUTTON") return;
-  document.querySelectorAll("#seg button").forEach(b=>b.classList.remove("active"));
-  e.target.classList.add("active");
-  state.doc = e.target.dataset.doc;
-  state.flags = {};
-  renderToggles(); renderResult();
-});
-renderToggles(); renderResult();
-
-/* ---------- Flowcharts (SVG) ---------- */
-function node(x,y,w,h,text,type){
-  const cx=x+w/2;
-  if(type==="dec"){ // diamond
-    const pts=`${cx},${y} ${x+w},${y+h/2} ${cx},${y+h} ${x},${y+h/2}`;
-    return `<polygon points="${pts}" fill="#fbf3e0" stroke="#d9b96a"/>`+label(cx,y+h/2,w-18,text,"#6b5418");
-  }
-  if(type==="start"){
-    return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="8" fill="#dfeafb" stroke="#9cc0e8"/>`+label(cx,y+h/2,w-14,text,"#274b6d");
-  }
-  return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="8" fill="#e6f4ee" stroke="#9fd1ba"/>`+label(cx,y+h/2,w-14,text,"#0a5d43");
-}
-function label(cx,cy,maxw,text,color){
-  const words=text.split(" ");const lines=[];let cur="";
-  const max=Math.floor(maxw/6.0);
-  words.forEach(w=>{ if((cur+" "+w).trim().length>max){lines.push(cur.trim());cur=w;} else cur+=" "+w; });
-  if(cur.trim())lines.push(cur.trim());
-  const start=cy-(lines.length-1)*6.5;
-  return `<text x="${cx}" y="${start}" text-anchor="middle" font-size="11" fill="${color}" font-family="-apple-system,Segoe UI,sans-serif">`+
-    lines.map((l,i)=>`<tspan x="${cx}" dy="${i===0?0:13}">${l.replace(/&/g,'&amp;')}</tspan>`).join("")+`</text>`;
-}
-function edge(x1,y1,x2,y2,t){
-  const mx=(x1+x2)/2,my=(y1+y2)/2;
-  return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#9aa7b8" stroke-width="1.4" marker-end="url(#arrow)"/>`+
-    (t?`<rect x="${mx-13}" y="${my-9}" width="26" height="16" rx="3" fill="#fff" opacity=".9"/><text x="${mx}" y="${my+3}" text-anchor="middle" font-size="10" fill="#5f6b7a" font-weight="600">${t}</text>`:"");
-}
-const FLOWS = {
-  blank: `<svg viewBox="0 0 880 430" xmlns="http://www.w3.org/2000/svg">
-    <defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#9aa7b8"/></marker></defs>
-    ${node(20,180,90,42,"Blank PO","start")}
-    ${edge(110,201,150,201)}
-    ${node(150,178,84,48,"Decorated?","dec")}
-    ${edge(234,192,300,150,"no")}
-    ${node(300,128,96,46,"Alternate Ship To?","dec")}
-    ${edge(396,151,470,120,"yes")}
-    ${node(470,98,150,46,"Alternate Ship To Address","end")}
-    ${edge(348,174,470,210,"no")}
-    ${node(470,188,150,44,"Order Shipping Address","end")}
-    ${edge(192,226,192,270,"yes")}
-    ${node(140,270,104,48,"Alternate Ship To?","dec")}
-    ${edge(244,294,300,294,"yes")}
-    ${node(300,272,150,44,"Alternate Ship To Address","end")}
-    ${edge(192,318,192,350,"no")}
-    ${node(120,350,144,52,"Ship to Us Instead of Decorator?","dec")}
-    ${edge(264,376,330,376,"no")}
-    ${node(330,354,150,44,"First Decorator Address","end")}
-    ${edge(540,232,540,272,"yes path")}
-    ${node(488,272,104,48,"Destination Warehouse?","dec")}
-    ${edge(592,296,650,296,"yes")}
-    ${node(650,274,150,44,"Destination Warehouse","end")}
-    ${edge(540,320,540,352,"no")}
-    ${node(488,352,104,48,"Corporate Identity?","dec")}
-    ${edge(592,376,650,356,"yes")}
-    ${node(650,338,150,40,"Corporate Identity Address","end")}
-    ${edge(540,400,650,408,"no")}
-    ${node(650,388,150,40,"Partner Address","end")}
-    <text x="455" y="258" font-size="10" fill="#8895a8">From “Ship to Us Instead of Decorator? = yes”</text>
-  </svg>`,
-  decorator: `<svg viewBox="0 0 880 430" xmlns="http://www.w3.org/2000/svg">
-    <defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#9aa7b8"/></marker></defs>
-    ${node(20,30,96,44,"Decorator PO","start")}
-    ${edge(116,52,170,52)}
-    ${node(170,28,96,48,"Alternate Ship To?","dec")}
-    ${edge(266,52,330,52,"yes")}
-    ${node(330,28,110,48,"Additional vendors?","dec")}
-    ${edge(440,52,520,40,"no")}
-    ${node(520,20,150,42,"Alternate Ship To Address","end")}
-    ${edge(385,76,385,108,"yes")}
-    ${node(310,108,150,52,"Second & Beyond Decorator (final shows Alternate)","end")}
-    ${edge(218,76,218,150,"no")}
-    ${node(166,150,104,50,"Ship to Us Upon Completion?","dec")}
-    ${edge(270,175,330,175,"yes")}
-    ${node(330,153,104,48,"Destination Warehouse?","dec")}
-    ${edge(434,177,520,165,"yes")}
-    ${node(520,143,150,42,"Destination Warehouse","end")}
-    ${edge(382,201,382,235,"no")}
-    ${node(330,235,104,48,"Corporate Identity?","dec")}
-    ${edge(434,259,520,247,"yes")}
-    ${node(520,225,150,42,"Corporate Identity Address","end")}
-    ${edge(382,283,382,315,"no")}
-    ${node(330,315,150,40,"Partner Address","end")}
-    ${edge(218,200,218,250,"no")}
-    ${node(166,250,104,48,"Additional vendors?","dec")}
-    ${edge(218,298,218,330,"either")}
-    ${node(150,330,150,42,"Order Shipping Address","end")}
-  </svg>`,
-  supplier: `<svg viewBox="0 0 880 430" xmlns="http://www.w3.org/2000/svg">
-    <defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#9aa7b8"/></marker></defs>
-    ${node(20,30,120,44,"Supplier Decorated PO","start")}
-    ${edge(140,52,185,52)}
-    ${node(185,28,96,48,"Alternate Ship To?","dec")}
-    ${edge(281,52,340,52,"yes")}
-    ${node(340,28,110,48,"Additional vendors?","dec")}
-    ${edge(450,52,530,40,"no")}
-    ${node(530,20,150,42,"Alternate Ship To Address","end")}
-    ${edge(395,76,395,108,"yes")}
-    ${node(320,108,150,52,"Second & Beyond Decorator (final shows Alternate)","end")}
-    ${edge(233,76,233,150,"no")}
-    ${node(181,150,104,50,"Ship to Us Upon Completion?","dec")}
-    ${edge(285,175,345,175,"yes")}
-    ${node(345,153,104,48,"Destination Warehouse?","dec")}
-    ${edge(449,177,530,165,"yes")}
-    ${node(530,143,150,42,"Destination Warehouse","end")}
-    ${edge(397,201,397,235,"no")}
-    ${node(345,235,104,48,"Corporate Identity?","dec")}
-    ${edge(449,259,530,247,"yes")}
-    ${node(530,225,150,42,"Corporate Identity Address","end")}
-    ${edge(397,283,397,315,"no")}
-    ${node(345,315,150,40,"Partner Address","end")}
-    ${edge(233,200,233,330,"no")}
-    ${node(165,330,150,42,"Order Shipping Address","end")}
-  </svg>`
-};
-function showFlow(k){ document.getElementById("flowwrap").innerHTML = FLOWS[k]; }
-document.getElementById("flowtabs").addEventListener("click", e=>{
-  if(e.target.tagName!=="BUTTON")return;
-  document.querySelectorAll("#flowtabs button").forEach(b=>b.classList.remove("active"));
-  e.target.classList.add("active");
-  showFlow(e.target.dataset.flow);
-});
-showFlow("blank");
-
-/* ---------- Scenario library ---------- */
-const SCEN = [
-  ["Blank PO","Not decorated · Alternate Ship To · Ship to Customer","Alternate Ship To Address"],
-  ["Blank PO","Decorated · Ship to Us Instead of Decorator · Destination Warehouse","Destination Warehouse"],
-  ["Blank PO","Decorated · Ship to Us Instead of Decorator · No warehouse · Corporate Identity","Corporate Identity Address"],
-  ["Blank PO","Decorated · Ship to Us Instead of Decorator · No warehouse · No corporate identity","Partner Address"],
-  ["Blank PO","Decorated · No Ship to Us","First Decorator Address"],
-  ["Blank PO","Not decorated · No alternate · default flow","Order Shipping Address"],
-  ["Decorator PO","Alternate Ship To · No additional vendors","Alternate Ship To Address"],
-  ["Decorator PO","Alternate Ship To · Additional vendors · NOT final PO","Second & Beyond Decorator"],
-  ["Decorator PO","Alternate Ship To · Additional vendors · final PO","Alternate Ship To Address"],
-  ["Decorator PO","No alternate · Additional vendors · No Ship to Us (final)","Order Shipping Address"],
-  ["Decorator PO","No alternate · No additional vendors · No Ship to Us","Order Shipping Address"],
-  ["Decorator PO","No alternate · Ship to Us Upon Completion · Destination Warehouse","Destination Warehouse"],
-  ["Decorator PO","No alternate · Ship to Us Upon Completion · No warehouse · Corporate Identity","Corporate Identity Address"],
-  ["Decorator PO","No alternate · Ship to Us Upon Completion · No warehouse · No corporate identity","Partner Address"],
-  ["Supplier Decorated PO","Alternate Ship To · No additional vendors","Alternate Ship To Address"],
-  ["Supplier Decorated PO","Alternate Ship To · Additional vendors","Second & Beyond Decorator (final shows Alternate)"],
-  ["Supplier Decorated PO","No alternate · Ship to Us Upon Completion · Destination Warehouse","Destination Warehouse"],
-  ["Supplier Decorated PO","No alternate · Ship to Us Upon Completion · No warehouse · Corporate Identity","Corporate Identity Address"],
-  ["Supplier Decorated PO","No alternate · Ship to Us Upon Completion · No warehouse · No corporate identity","Partner Address"],
-  ["Supplier Decorated PO","No alternate · No additional vendors · No Ship to Us","Order Shipping Address"],
-  ["Store Order","Default — Supplier PO + Decorator PO","Supplier ships from Vendor; Decorator ships to Store Customer (store fields)"],
-  ["Store Order","Supplier PO only","Ships to Store Customer using store-specific fields"],
-  ["Store Order","Ship to Us enabled","Same Ship-to-Us logic with store field mappings"],
-  ["Store Order","Alternate Ship To enabled","Same Alternate logic with store field mappings"]
-];
-function renderScen(){
-  const q = document.getElementById("scenSearch").value.toLowerCase();
-  const filt = document.getElementById("scenFilter").value;
-  const body = document.getElementById("scenBody");
-  body.innerHTML = SCEN.filter(r=>{
-    const matchQ = (r[0]+" "+r[1]+" "+r[2]).toLowerCase().includes(q);
-    const matchF = filt==="all" || r[0]===filt;
-    return matchQ && matchF;
-  }).map(r=>`<tr><td><span class="badge">${r[0]}</span></td><td>${r[1]}</td><td><span class="addr-chip">${r[2]}</span></td></tr>`).join("")
-    || `<tr><td colspan="3" style="color:var(--muted);text-align:center;padding:22px">No scenarios match.</td></tr>`;
-}
-document.getElementById("scenSearch").addEventListener("input",renderScen);
-document.getElementById("scenFilter").addEventListener("change",renderScen);
-renderScen();
-</script>
+  <div class="footer" style="max-width:1700px;margin:0 auto">
+    Antera Documentation · Internal QA &amp; Support knowledge base · Describes intended system behavior.
+  </div>
 </body>
 </html>
