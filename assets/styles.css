@@ -131,6 +131,7 @@ code{background:#eef1f5;border:1px solid #e0e5ec;border-radius:5px;padding:1px 6
 .sw input:checked + span{background:var(--blue)}
 .sw input:checked + span:before{transform:translateX(19px)}
 .result .reslabel{font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);font-weight:700}
+.result .resfrom{font-size:15px;font-weight:700;color:var(--navy-2);margin:6px 0 2px;line-height:1.25}
 .result .resaddr{font-size:23px;font-weight:800;color:var(--accent);margin:8px 0 4px;line-height:1.2}
 .result .ressource{font-size:13.5px;color:var(--muted);margin-bottom:16px}
 .result .ressource b{color:var(--navy-2)}
