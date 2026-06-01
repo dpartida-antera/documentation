@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PO Shipping Address Guide — QA & Support Reference</title>
+<title>PO Shipping Address Guide, QA & Support Reference</title>
 <style>
   :root{
     --navy:#1f3a5f; --navy-2:#27496d; --blue:#2f6fb0; --blue-soft:#eaf2fb;
@@ -136,7 +136,7 @@
   <main>
     <div class="hero">
       <h1>PO Shipping Address Guide</h1>
-      <p>How the system decides <i>where every purchase order ships</i> — written for QA and Support. Start with the mental model, then use the interactive tool to confirm any case in seconds.</p>
+      <p>How the system decides <i>where every purchase order ships</i>, written for QA and Support. Start with the mental model, then use the interactive tool to confirm any case in seconds.</p>
       <span class="pill">Intended behavior reference · Standard &amp; Store orders</span>
     </div>
 
@@ -174,7 +174,7 @@
           <p>Used when the product and its decoration come from the <i>same</i> supplier. Follows the same address logic as a Decorator PO.</p>
         </div>
       </div>
-      <div class="note"><b>Multi-decoration chains:</b> when an item carries decorations from several vendors, POs hand off in sequence — Supplier → Decorator 1 → Decorator 2 → … → final destination. Only the <b>final</b> PO in the chain ships to the customer (or Alternate address); every earlier PO ships to the <i>next</i> decorator.</div>
+      <div class="note"><b>Multi-decoration chains:</b> when an item carries decorations from several vendors, POs hand off in sequence, Supplier → Decorator 1 → Decorator 2 → … → final destination. Only the <b>final</b> PO in the chain ships to the customer (or Alternate address); every earlier PO ships to the <i>next</i> decorator.</div>
     </section>
 
     <!-- FLAGS -->
@@ -211,7 +211,7 @@
           <tr><td><span class="addr-chip">Partner Address</span></td><td>Your own <b>Partner Company</b> address (system default for Ship to Us).</td></tr>
         </tbody>
       </table>
-      <div class="info">A <b>Supplier PO</b> in a standard “ship to decorator” flow ships <i>from the Vendor</i> — its address block is sourced from the Vendor record, not from the list above.</div>
+      <div class="info">A <b>Supplier PO</b> in a standard “ship to decorator” flow ships <i>from the Vendor</i>, its address block is sourced from the Vendor record, not from the list above.</div>
     </section>
 
     <!-- PRIORITY -->
@@ -241,7 +241,7 @@
         </div>
         <div class="result">
           <div class="reslabel">Ships to</div>
-          <div class="resaddr" id="resAddr">—</div>
+          <div class="resaddr" id="resAddr">-</div>
           <div class="ressource" id="resSource"></div>
           <div class="fieldbox">
             <h5>Expected address-block fields</h5>
@@ -269,7 +269,7 @@
       <h2><span class="num">08</span>Scenario library</h2>
       <p class="lead">Worked examples of intended behavior. Search by keyword or filter by document to confirm what <i>should</i> happen for a given flag combination.</p>
       <div class="filterbar">
-        <input type="text" id="scenSearch" placeholder="Search scenarios — e.g. “warehouse”, “corporate identity”, “alternate”…">
+        <input type="text" id="scenSearch" placeholder="Search scenarios, e.g. “warehouse”, “corporate identity”, “alternate”…">
         <select id="scenFilter">
           <option value="all">All documents</option>
           <option value="Blank PO">Blank PO</option>
@@ -287,9 +287,9 @@
     <!-- FIELDS -->
     <section id="fields">
       <h2><span class="num">09</span>Field mapping reference</h2>
-      <p class="lead">The exact field names populated in the address block, by source. Use this when an address looks wrong — confirm each field traces back to the right source record.</p>
+      <p class="lead">The exact field names populated in the address block, by source. Use this when an address looks wrong, confirm each field traces back to the right source record.</p>
 
-      <h3>Order source — Ship to Customer (Standard order)</h3>
+      <h3>Order source: Ship to Customer (Standard order)</h3>
       <p style="margin:0 0 8px;color:var(--muted);font-size:13.5px">Used for the default Order Shipping Address.</p>
       <table><tbody>
         <tr><td><code>shippingCustomerName</code></td><td><code>shippingCompanyName</code></td><td><code>shippingCustomerEmail</code></td></tr>
@@ -298,7 +298,7 @@
         <tr><td><code>shippingPhone</code> <span class="badge">conditional</span></td><td></td><td></td></tr>
       </tbody></table>
 
-      <h3>Vendor source — Supplier PO ships to decorator</h3>
+      <h3>Vendor source: Supplier PO ships to decorator</h3>
       <table><tbody>
         <tr><td><code>accountName</code></td><td><code>email</code></td><td><code>shipAddress1</code></td></tr>
         <tr><td><code>shipAddress2</code> <span class="badge">conditional</span></td><td><code>shipCity</code></td><td><code>shipState</code></td></tr>
@@ -312,28 +312,28 @@
         <tr><td><code>shipPostalCode</code></td><td><code>shipCountry</code></td><td><code>shipPhone</code> <span class="badge">conditional</span></td></tr>
       </tbody></table>
 
-      <h3>Partner Company source — Ship to Us, no Corporate Identity</h3>
+      <h3>Partner Company source: Ship to Us, no Corporate Identity</h3>
       <table><tbody>
         <tr><td><code>Partner Company</code></td><td><code>Partner Address</code></td><td><code>Partner Address 2</code> <span class="badge">conditional</span></td></tr>
         <tr><td><code>Partner City</code></td><td><code>Partner State</code></td><td><code>Partner Postal Code</code></td></tr>
         <tr><td><code>Partner Country</code></td><td><code>Partner Phone</code></td><td></td></tr>
       </tbody></table>
 
-      <h3>Corporate Identity source — Ship to Us, Corporate Identity used</h3>
+      <h3>Corporate Identity source: Ship to Us, Corporate Identity used</h3>
       <table><tbody>
         <tr><td><code>Corporate Identity Name</code></td><td><code>Shipping Street</code></td><td><code>Shipping City</code></td></tr>
         <tr><td><code>Shipping State</code></td><td><code>Shipping Postal Code</code></td><td><code>Shipping Country</code></td></tr>
         <tr><td><code>Phone</code></td><td></td><td></td></tr>
       </tbody></table>
 
-      <h3>Order source — Ship to Store Customer (Store order)</h3>
+      <h3>Order source: Ship to Store Customer (Store order)</h3>
       <table><tbody>
         <tr><td><code>storeShippingAttentionTo</code></td><td><code>storeShippingCompanyName</code></td><td><code>storeShippingContactEmail</code></td></tr>
         <tr><td><code>shippingStreet</code></td><td><code>shippingStreet2</code> <span class="badge">conditional</span></td><td><code>shippingCity</code></td></tr>
         <tr><td><code>shippingState</code></td><td><code>shippingPostalCode</code></td><td><code>shippingCountry</code></td></tr>
         <tr><td><code>shippingPhone</code> <span class="badge">conditional</span></td><td></td><td></td></tr>
       </tbody></table>
-      <div class="info"><b>Store orders</b> follow the exact same routing logic as standard orders — only the customer-facing field names differ (the <code>store…</code> prefixed fields above).</div>
+      <div class="info"><b>Store orders</b> follow the exact same routing logic as standard orders, only the customer-facing field names differ (the <code>store…</code> prefixed fields above).</div>
     </section>
 
     <!-- DISPLAY -->
@@ -343,12 +343,12 @@
       <table>
         <thead><tr><th style="width:220px">Field</th><th>Rule</th></tr></thead>
         <tbody>
-          <tr><td><b>Address Line 2</b><br><code>shipAddress2 / shippingStreet2</code></td><td>Display only when a value is present. When empty/null, the field is <b>omitted entirely</b> — no blank line.</td></tr>
+          <tr><td><b>Address Line 2</b><br><code>shipAddress2 / shippingStreet2</code></td><td>Display only when a value is present. When empty/null, the field is <b>omitted entirely</b>, no blank line.</td></tr>
           <tr><td><b>Phone</b><br><code>shippingPhone / shipPhone</code></td><td>Display only when a value is present; otherwise omitted entirely.</td></tr>
           <tr><td><b>Email</b></td><td>Display whenever it is available from the source.</td></tr>
         </tbody>
       </table>
-      <div class="note"><b>QA tip:</b> a missing Address Line 2 or Phone is <i>expected</i> when the source has no value — it should never render as an empty line. Treat a blank placeholder line as a defect.</div>
+      <div class="note"><b>QA tip:</b> a missing Address Line 2 or Phone is <i>expected</i> when the source has no value, it should never render as an empty line. Treat a blank placeholder line as a defect.</div>
     </section>
 
     <!-- GLOSSARY -->
@@ -358,10 +358,10 @@
         <tr><td style="width:230px"><b>PO (Purchase Order)</b></td><td>A document instructing one party to supply/decorate/ship goods. One order can spawn several.</td></tr>
         <tr><td><b>Blank / Blank Supplier</b></td><td>Undecorated product and the vendor that provides it.</td></tr>
         <tr><td><b>Decorator</b></td><td>The vendor that applies artwork (embroidery, screen print, etc.).</td></tr>
-        <tr><td><b>Final / Final Decorator PO</b></td><td>The last PO in a decoration chain — the one that ships to the customer or Alternate address.</td></tr>
+        <tr><td><b>Final / Final Decorator PO</b></td><td>The last PO in a decoration chain, the one that ships to the customer or Alternate address.</td></tr>
         <tr><td><b>Ship to Us</b></td><td>Routing goods back to your own location (warehouse → corporate identity → partner) instead of onward.</td></tr>
         <tr><td><b>Corporate Identity</b></td><td>A branded account-specific shipping location used for Ship-to-Us when no warehouse is set.</td></tr>
-        <tr><td><b>Partner Address</b></td><td>Your own company's default address — the final fallback for Ship-to-Us.</td></tr>
+        <tr><td><b>Partner Address</b></td><td>Your own company's default address, the final fallback for Ship-to-Us.</td></tr>
         <tr><td><b>Alternate Ship To</b></td><td>A one-off override address entered on the order; highest routing priority.</td></tr>
       </tbody></table>
     </section>
@@ -376,13 +376,13 @@
 <script>
 /* ---------- Address metadata ---------- */
 const ADDR = {
-  order:        {name:"Order Shipping Address", source:"Order — customer address on the order", fields:["shippingCustomerName","shippingCompanyName","shippingCustomerEmail","shippingStreet","shippingStreet2 (cond.)","shippingCity","shippingState","shippingPostalCode","shippingCountry","shippingPhone (cond.)"]},
+  order:        {name:"Order Shipping Address", source:"Order, customer address on the order", fields:["shippingCustomerName","shippingCompanyName","shippingCustomerEmail","shippingStreet","shippingStreet2 (cond.)","shippingCity","shippingState","shippingPostalCode","shippingCountry","shippingPhone (cond.)"]},
   alternate:    {name:"Alternate Ship To Address", source:"Alternate Ship To override fields", fields:["accountName","email","shipAddress1","shipAddress2 (cond.)","shipCity","shipState","shipPostalCode","shipCountry","shipPhone (cond.)"]},
   firstDecorator:{name:"First Decorator Address", source:"First decorator vendor's shipping address", fields:["accountName","email","shipAddress1","shipAddress2 (cond.)","shipCity","shipState","shipPostalCode","shipCountry"]},
   secondBeyond: {name:"Second & Beyond Decorator", source:"Next decorator vendor in the chain (final PO shows Alternate / Order)", fields:["accountName","email","shipAddress1","shipAddress2 (cond.)","shipCity","shipState","shipPostalCode","shipCountry"]},
   warehouse:    {name:"Destination Warehouse", source:"Configured Destination Warehouse address", fields:["Warehouse Name","Address 1","Address 2 (cond.)","City","State","Postal Code","Country","Phone"]},
   corpIdentity: {name:"Corporate Identity Address", source:"Corporate Identity on the account", fields:["Corporate Identity Name","Shipping Street","Shipping City","Shipping State","Shipping Postal Code","Shipping Country","Phone"]},
-  partner:      {name:"Partner Address", source:"System — your Partner Company record", fields:["Partner Company","Partner Address","Partner Address 2 (cond.)","Partner City","Partner State","Partner Postal Code","Partner Country","Partner Phone"]}
+  partner:      {name:"Partner Address", source:"System, your Partner Company record", fields:["Partner Company","Partner Address","Partner Address 2 (cond.)","Partner City","Partner State","Partner Postal Code","Partner Country","Partner Phone"]}
 };
 
 /* ---------- Toggle definitions per document ---------- */
@@ -626,7 +626,7 @@ const SCEN = [
   ["Supplier Decorated PO","No alternate · Ship to Us Upon Completion · No warehouse · Corporate Identity","Corporate Identity Address"],
   ["Supplier Decorated PO","No alternate · Ship to Us Upon Completion · No warehouse · No corporate identity","Partner Address"],
   ["Supplier Decorated PO","No alternate · No additional vendors · No Ship to Us","Order Shipping Address"],
-  ["Store Order","Default — Supplier PO + Decorator PO","Supplier ships from Vendor; Decorator ships to Store Customer (store fields)"],
+  ["Store Order","Default, Supplier PO + Decorator PO","Supplier ships from Vendor; Decorator ships to Store Customer (store fields)"],
   ["Store Order","Supplier PO only","Ships to Store Customer using store-specific fields"],
   ["Store Order","Ship to Us enabled","Same Ship-to-Us logic with store field mappings"],
   ["Store Order","Alternate Ship To enabled","Same Alternate logic with store field mappings"]

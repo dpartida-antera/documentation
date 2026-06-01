@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auto Allocation Guide · Antera Documentation</title>
+<link rel="stylesheet" href="assets/styles.css">
+<style>
+  /* ---- Auto-allocation page specifics ---- */
+  .loc{background:#f3f6fb;border:1px solid #dde6f1;border-left:4px solid var(--blue);border-radius:9px;padding:10px 13px;margin:8px 0;font-size:13px}
+  .loc b{color:var(--navy)}
+  .loc .path{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;color:var(--navy-2);background:#fff;border:1px solid var(--line);border-radius:6px;padding:1px 7px}
+  .loc-inline{font-size:12.5px;color:var(--navy-2);background:#f3f6fb;border:1px solid #dde6f1;border-radius:6px;padding:2px 8px;white-space:nowrap}
+  .shotgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-top:12px}
+  .shot{border:1.5px dashed #c3cdd9;border-radius:10px;background:#fafbfd;padding:14px;font-size:12.5px;color:var(--muted)}
+  .shot b{display:block;color:var(--navy);font-size:13px;margin-bottom:3px}
+  .shot .ph{margin-top:8px;height:96px;border-radius:7px;background:repeating-linear-gradient(45deg,#eef1f5,#eef1f5 9px,#f6f8fb 9px,#f6f8fb 18px);display:flex;align-items:center;justify-content:center;color:#9aa7b8;font-size:11.5px}
+  .shot a.img{display:block;margin-top:8px}
+  .shot img{width:100%;border-radius:7px;border:1px solid var(--line);display:block;cursor:zoom-in}
+  /* simulator */
+  .mx{width:100%;border-collapse:collapse;margin:4px 0 8px}
+  .mx th{font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);text-align:left;padding:4px 6px;font-weight:700}
+  .mx td{padding:3px 6px}
+  .mx input{width:62px;padding:6px 8px;border:1px solid var(--line);border-radius:7px;font-size:13px;box-sizing:border-box}
+  .mx input.size{width:58px}
+  .mx .rm{cursor:pointer;color:#c83838;border:none;background:none;font-size:17px;line-height:1}
+  .simbtns{display:flex;gap:7px;flex-wrap:wrap;margin:4px 0 14px}
+  .simbtns button{border:1px solid var(--line);background:var(--card);padding:6px 11px;border-radius:7px;font-size:12px;font-weight:600;color:var(--navy-2);cursor:pointer}
+  .simbtns button:hover{border-color:var(--blue);color:var(--blue)}
+  .linecard{border:1px solid var(--line);border-radius:11px;padding:13px 15px;margin-top:11px;background:var(--card)}
+  .linecard.ds{background:#fff7ef;border-color:#f0d6b6}
+  .linecard.flip{background:#fff7ef;border-color:#f0d6b6}
+  .linecard h6{margin:0 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--navy)}
+  .lrow{display:grid;grid-template-columns:60px 60px 1fr;gap:8px;align-items:center;padding:4px 0;border-top:1px solid var(--line);font-size:13.5px}
+  .lrow:first-of-type{border-top:none}
+  .lrow .sz{font-weight:700;color:var(--navy-2)}
+  .tp{display:inline-block;font-size:11px;font-weight:700;border-radius:5px;padding:2px 8px}
+  .tp.stock{background:#e6f6ee;color:#0a8a4f}
+  .tp.dropship{background:#fde7d6;color:#a9620a}
+  .bell{display:inline-block;font-size:11.5px;color:#a9760a;background:#fdf6e3;border:1px solid #ecd595;border-radius:5px;padding:1px 7px;margin-left:8px}
+  .xfer{margin-top:10px;font-size:12.8px;color:#0a5d43;background:#e9f6ef;border:1px solid #b9e0cc;border-radius:8px;padding:8px 11px}
+  .simwhy{margin-top:12px;font-size:12.8px;color:var(--muted)}
+  .simwhy b{color:var(--navy-2)}
+  .matchhint{margin-top:6px;font-size:12px;color:var(--blue);font-weight:600}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand"><div class="logo">A</div><b>Antera Documentation</b><span>· Auto Allocation</span></div>
+    <div class="spacer"></div>
+    <a class="barlink" href="auto-allocation-qa.html">QA Runner</a>
+    <a class="barlink" href="index.html">← All guides</a>
+  </div>
+
+  <div class="doc-layout">
+    <aside class="docnav">
+      <a class="backlink" href="index.html">← All guides</a>
+      <div class="doctitle">Auto Allocation Guide</div>
+      <div class="docsub">QA &amp; Support reference</div>
+      <nav>
+        <a class="section">Understand</a>
+        <a href="#start">How it works</a>
+        <a href="#prereq">Prerequisites</a>
+        <a href="#flags">Settings &amp; flags</a>
+        <a href="#outcomes">Allocation outcomes</a>
+        <a href="#warehouse">Warehouse priority</a>
+        <a href="#parent">Parent → Child transfer</a>
+        <a class="section">Use</a>
+        <a href="#tool">Allocation simulator</a>
+        <a href="#flows">Decision flowcharts</a>
+        <a href="#scenarios">Scenario library</a>
+        <a href="#qa">QA test runner</a>
+        <a class="section">Reference</a>
+        <a href="#glossary">Glossary</a>
+      </nav>
+    </aside>
+
+    <main class="doc">
+      <div class="hero">
+        <h1>Auto Allocation Guide</h1>
+        <p>How the system decides, line item by line item, <i>what ships from stock and what gets dropshipped</i> when you book a pending order, including partial stock, backorders, warehouse priority, and pulling inventory from a parent. Written for QA and Support.</p>
+        <span class="pill">Intended behavior reference · Standard &amp; Store orders</span>
+      </div>
+
+      <!-- START -->
+      <section id="start">
+        <h2><span class="num">01</span>How auto-allocation works, in one minute</h2>
+        <p class="lead">When you <b>book</b> a pending order, auto-allocation walks every line item, and every size (matrix row) within it, and asks one question: <b>“can I cover this from stock?”</b> Then it reserves what it can and routes the rest.</p>
+        <div class="info">
+          <b>Three outcomes per size, decided by available stock:</b><br>
+          1) <b>Enough stock</b> → the row stays <b>Stock</b> and the inventory is reserved. &nbsp;→&nbsp;
+          2) <b>Partial stock</b> → the covered quantity stays Stock; the shortfall becomes a <b>DropShip line</b> (or a <b>Backorder</b>, if that mode is on). &nbsp;→&nbsp;
+          3) <b>No stock</b> → DropShip / Backorder / in-place flip, depending on settings.
+        </div>
+        <p>Two things can change the “available stock” number before the decision is made: <b>which warehouse</b> the system looks in (there's a priority order), and whether it's allowed to <b>pull inventory from a parent product</b> into the child. Both are covered below. The line-item “source from stock vs. dropship” value is called the <b>Matrix PO type</b>, it appears as <b>Source</b> on the order line. (On the product itself, the eligibility field is <b>Li Type</b>.)</p>
+      </section>
+
+      <!-- PREREQ -->
+      <section id="prereq">
+        <h2><span class="num">02</span>Prerequisites: when auto-allocation runs</h2>
+        <p class="lead">All of these must be true, or the order books without any auto-allocation happening.</p>
+        <table>
+          <thead><tr><th style="width:300px">Requirement</th><th>Detail</th></tr></thead>
+          <tbody>
+            <tr><td><b>Order is Pending</b></td><td>Allocation happens when a <b>pending</b> order is booked.</td></tr>
+            <tr><td><b>Auto Allocation is ON</b></td><td>The system-level setting must be enabled in <b>Admin ▸ Antera Admin ▸ Settings ▸ Orders ▸ Inventory Sourcing</b>.</td></tr>
+            <tr><td><b>Order has line items</b></td><td>There must be at least one line item to evaluate.</td></tr>
+            <tr><td><b>Product Li Type = Stock</b></td><td>Set on the product itself (the <b>Li Type</b> field). Only <b>Stock</b>-type products are eligible; for those, each line item can be set to <b>release from stock</b> or <b>dropship</b>, the Matrix PO type, shown as <b>Source</b> on the line.</td></tr>
+          </tbody>
+        </table>
+        <div class="note"><b>Aether Store Orders</b> have a special path: a zero-stock line is sent to backorder even when the system-level auto-allocation setting is OFF (see scenarios SC-10 / SC-11).</div>
+      </section>
+
+      <!-- FLAGS -->
+      <section id="flags">
+        <h2><span class="num">03</span>Settings &amp; flags that drive allocation</h2>
+        <p class="lead">Each of these changes how a shortfall is handled or where stock is pulled from. The <b>Where to find it</b> column is the menu path; screenshots are added below.</p>
+        <table>
+          <thead><tr><th style="width:230px">Setting</th><th>What it does</th><th style="width:260px">Where to find it</th></tr></thead>
+          <tbody>
+            <tr><td><b>Auto Allocation</b></td><td>Master switch. Must be ON for allocation to run at all.</td><td><span class="loc-inline">Admin ▸ Antera Admin ▸ Settings ▸ Orders ▸ Inventory Sourcing</span></td></tr>
+            <tr><td><b>Allow No/Low Stock Allocation (Generate Backorder Quantity)</b><br><span class="badge">“Backorder mode”</span></td><td>When ON, a shortfall is <b>not</b> split into a DropShip line. The line stays a single Stock line and the missing quantity is recorded as a <b>backorder</b> (bell icon). Zero-qty rows are kept, not stripped.</td><td><span class="loc-inline">Admin ▸ Settings ▸ Orders ▸ Inventory Sourcing</span></td></tr>
+            <tr><td><b>Li Type = Stock</b></td><td>Set on the product. Makes a product eligible for allocation; its line items can then choose stock vs. dropship.</td><td><span class="loc-inline">Product record · Li Type field</span></td></tr>
+            <tr><td><b>Matrix PO type</b> <span class="badge">shown as “Source”</span></td><td>Per line-item value: source this row from <b>Stock</b> or <b>DropShip</b>. This is what allocation reads and rewrites; it appears as <b>Source</b> on the order line.</td><td><span class="loc-inline">Order ▸ line item · Source</span></td></tr>
+            <tr><td><b>Primary / Secondary / Tertiary warehouse</b></td><td>The global priority order the system searches for stock, set per warehouse via the <b>Auto Allocation Priority</b> column.</td><td><span class="loc-inline">Admin ▸ Configuration ▸ Warehouse</span></td></tr>
+            <tr><td><b>Default warehouse</b></td><td>Fallback used when none of the priority warehouses have stock, the warehouse with its <b>Default</b> toggle on.</td><td><span class="loc-inline">Admin ▸ Configuration ▸ Warehouse · Default toggle</span></td></tr>
+            <tr><td><b>Customer warehouse override</b></td><td>Per-customer Primary/Secondary/Tertiary that <b>replaces</b> the global priority for that customer.</td><td><span class="loc-inline">Customer ▸ Warehouse tab</span></td></tr>
+            <tr><td><b>Search Warehouses for Stock</b></td><td>Customer setting. When ON, after the priority warehouses come up short, the system scans <b>any other</b> warehouse for stock, and the Default last.</td><td><span class="loc-inline">Customer ▸ Warehouse tab (bottom)</span></td></tr>
+            <tr><td><b>Share Parent Inventory</b></td><td>When ON, a child product can pull inventory from its parent at booking (see §06).</td><td><span class="loc-inline">Product ▸ Child Product Settings</span></td></tr>
+            <tr><td><b>Allow Transfer Parent Inventory to Child Pre-Decorated Products</b><br><span class="badge">Aether Orders Only</span></td><td>System-level enable for parent → child transfer. Per the setting label, it is scoped to <b>Aether orders</b> and <b>pre-decorated child products</b>.</td><td><span class="loc-inline">Admin ▸ Settings ▸ Orders ▸ Inventory Sourcing</span></td></tr>
+          </tbody>
+        </table>
+
+        <h3>Setting locations</h3>
+        <p style="margin:0 0 6px;color:var(--muted);font-size:13.5px">Where each setting lives in Antera. Click any image to open it full size.</p>
+        <div class="shotgrid">
+          <div class="shot"><b>Auto Allocation · Backorder mode · Parent-transfer (Aether)</b>Admin ▸ Antera Admin ▸ Settings ▸ Orders ▸ Inventory Sourcing<a class="img" href="assets/screenshots/auto-allocation-backorder.png" target="_blank" rel="noopener"><img src="assets/screenshots/auto-allocation-backorder.png" alt="Inventory Sourcing settings: Auto Allocation, Allow No/Low Stock Allocation, and Allow Transfer Parent Inventory to Child Pre-Decorated Products (Aether Orders Only)"></a></div>
+          <div class="shot"><b>Li Type = Stock</b>Product record · Li Type field<a class="img" href="assets/screenshots/li-type-stock.png" target="_blank" rel="noopener"><img src="assets/screenshots/li-type-stock.png" alt="Product record showing Li Type = Stock"></a></div>
+          <div class="shot"><b>Matrix PO type / Source (line item)</b>Order ▸ line item · Source: Stock / DropShip<a class="img" href="assets/screenshots/matrix-po-type.png" target="_blank" rel="noopener"><img src="assets/screenshots/matrix-po-type.png" alt="Order line items showing Source: Stock and Source: DropShip"></a></div>
+          <div class="shot"><b>Global warehouses · Default · Auto Allocation Priority</b>Admin ▸ Configuration ▸ Warehouse<a class="img" href="assets/screenshots/global-warehouses-default.png" target="_blank" rel="noopener"><img src="assets/screenshots/global-warehouses-default.png" alt="Admin Configuration Warehouse list with Default toggle and Auto Allocation Priority column"></a></div>
+          <div class="shot"><b>Customer override + Search Warehouses for Stock</b>Customer ▸ Warehouse tab<a class="img" href="assets/screenshots/customer-warehouse-search.png" target="_blank" rel="noopener"><img src="assets/screenshots/customer-warehouse-search.png" alt="Customer Warehouse tab: Primary/Secondary/Tertiary warehouse and Search Warehouses for Stock toggle"></a></div>
+          <div class="shot"><b>Share Parent Inventory</b>Product ▸ Child Product Settings<a class="img" href="assets/screenshots/share-parent-inventory.png" target="_blank" rel="noopener"><img src="assets/screenshots/share-parent-inventory.png" alt="Child Product Settings with Share Parent Inventory toggle on"></a></div>
+        </div>
+      </section>
+
+      <!-- OUTCOMES -->
+      <section id="outcomes">
+        <h2><span class="num">04</span>The allocation outcomes</h2>
+        <p class="lead">For each size (matrix row), <code>allocated = min(required, available stock)</code> and <code>remainder = required − allocated</code>. What happens to the remainder is the whole story.</p>
+        <div class="grid g3">
+          <div class="card doc-card"><span class="tag">Full</span><h4>All Stock</h4><p>Stock covers the row. It stays <b>Stock</b> and the inventory is reserved. No DropShip line.</p></div>
+          <div class="card doc-card"><span class="tag">Partial · default</span><h4>Stock + DropShip line</h4><p>The covered quantity stays <b>Stock</b> on the original line; the shortfall (plus any fully-unstocked sizes) moves to a <b>new DropShip line</b>. Zero-stock sizes are removed from the original line.</p></div>
+          <div class="card doc-card"><span class="tag">Partial · backorder</span><h4>Stock + Backorder</h4><p>With <b>Backorder mode</b> on, nothing splits off. The line stays a single <b>Stock</b> line and the shortfall is stored as a backorder (bell). Zero-qty rows are kept.</p></div>
+        </div>
+        <div class="note"><b>When no size has any stock:</b> there's nothing to keep as Stock, so the <b>entire original line flips to DropShip in-place</b> (no separate line). If there's no inventory record at all and no Default warehouse configured, the same in-place flip happens. With a Default warehouse + Backorder mode, the full quantity is backordered against the Default warehouse instead.</div>
+      </section>
+
+      <!-- WAREHOUSE -->
+      <section id="warehouse">
+        <h2><span class="num">05</span>Warehouse priority &amp; fallback</h2>
+        <p class="lead">“Available stock” depends on <i>which</i> warehouse the system checks. It walks a priority list and stops at the first that can cover the row.</p>
+        <table>
+          <thead><tr><th style="width:60px">Order</th><th>Warehouse</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td><b>1</b></td><td>Primary</td><td>The customer's Primary if a customer override is set; otherwise the global Primary.</td></tr>
+            <tr><td><b>2</b></td><td>Secondary</td><td>Customer override or global.</td></tr>
+            <tr><td><b>3</b></td><td>Tertiary</td><td>Customer override or global.</td></tr>
+            <tr><td><b>4</b></td><td>Any other warehouse</td><td>Only if <b>Search Warehouses for Stock</b> is ON for the customer.</td></tr>
+            <tr><td><b>5</b></td><td>Default warehouse</td><td>Final fallback. If it has no stock either, the row follows the DropShip / Backorder rules.</td></tr>
+          </tbody>
+        </table>
+        <div class="info"><b>Customer override wins:</b> if a customer has its own Primary/Secondary/Tertiary set, the global priority list is not consulted for that customer (scenario SC-9). The <b>Default</b> warehouse is always the last-resort fallback.</div>
+        <div class="note"><b>Where this is configured:</b> the global priority is set per warehouse in the <b>Auto Allocation Priority</b> column under <b>Admin ▸ Configuration ▸ Warehouse</b>, and the <b>Default</b> warehouse is the one whose <b>Default</b> toggle is on there. The customer-level overrides and <b>Search Warehouses for Stock</b> live on the <b>Customer ▸ Warehouse</b> tab.</div>
+      </section>
+
+      <!-- PARENT -->
+      <section id="parent">
+        <h2><span class="num">06</span>Parent → Child inventory transfer</h2>
+        <p class="lead">With <b>Share Parent Inventory</b> on (Product ▸ Child Product Settings), a child that's short on stock can pull inventory from its parent at booking time, before the shortfall is dropshipped or backordered.</p>
+        <p>At booking the system searches the child's warehouses first. If the child can't cover the row, it looks at the parent's inventory. If the parent has it, the needed quantity is <b>transferred into the child</b> (FIFO by lot, with cost carried over); if not, the row follows the normal DropShip / Backorder rules.</p>
+        <div class="info"><b>Two switches enable this:</b> the product opt-in <b>Share Parent Inventory</b> (Product ▸ Child Product Settings), and the system-level <b>Allow Transfer Parent Inventory to Child Pre-Decorated Products</b> (Admin ▸ Settings ▸ Orders ▸ Inventory Sourcing). Per that setting's label, the transfer is scoped to <b>Aether orders</b> and <b>pre-decorated child products</b>.</div>
+        <table>
+          <thead><tr><th style="width:280px">Rule</th><th>Behavior</th></tr></thead>
+          <tbody>
+            <tr><td><b>Only Stock-type lines</b></td><td>If the line's Matrix PO type is DropShip, no transfer happens.</td></tr>
+            <tr><td><b>Transfer amount</b></td><td><code>min(shortfall, parent inventory)</code>. If the parent can't cover it all, the rest is backordered/dropshipped.</td></tr>
+            <tr><td><b>Warehouse type must match…</b></td><td>The transfer normally only works when parent and child stock are the <b>same warehouse type</b>: Customer-owned, Distributor-owned (default), or Vendor-owned.</td></tr>
+            <tr><td><b>…unless the child has zero</b></td><td>If the child has <b>0</b> stock for the required items, it <b>can</b> pull from the parent regardless of warehouse type.</td></tr>
+            <tr><td><b>FIFO &amp; cost</b></td><td>Quantity is taken from parent lots oldest-first. If the child has its own cost it's used; otherwise a weighted-average cost from the parent lots is applied.</td></tr>
+            <tr><td><b>Unreserve doesn't reverse it</b></td><td>If, after booking, you unreserve the items on the line, the <b>child keeps</b> the transferred inventory, it is <b>not</b> sent back to the parent.</td></tr>
+          </tbody>
+        </table>
+        <div class="note"><b>Common gotcha:</b> parent has stock in a <i>Customer-owned</i> warehouse, child has partial stock in a <i>Distributor-owned</i> warehouse → the transfer will <b>not</b> happen (types differ and the child isn't at zero). The child would need 0 stock for the type rule to be bypassed.</div>
+      </section>
+
+      <!-- TOOL -->
+      <section id="tool">
+        <h2><span class="num">07</span>Allocation simulator</h2>
+        <p class="lead">Enter the required and in-stock quantities per size, flip the flags, and see exactly how the line item is rewritten when the order books. This mirrors the system's allocation rules.</p>
+        <div class="card tool">
+          <div class="controls">
+            <div class="simbtns" id="presets">
+              <span style="font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:700;align-self:center;margin-right:2px">Load:</span>
+              <button data-p="SC-1">SC-1 full</button>
+              <button data-p="SC-2">SC-2 mixed</button>
+              <button data-p="SC-3">SC-3 partial</button>
+              <button data-p="SC-4">SC-4 all zero</button>
+              <button data-p="SC-5">SC-5 backorder</button>
+              <button data-p="SC-6">SC-6 parent</button>
+            </div>
+            <table class="mx">
+              <thead><tr><th>Size</th><th>Required</th><th>Stock</th><th class="pcol" style="display:none">Parent</th><th></th></tr></thead>
+              <tbody id="mxBody"></tbody>
+            </table>
+            <button class="simbtns" id="addRow" style="border:1px dashed var(--line);background:var(--card);padding:6px 12px;border-radius:7px;font-size:12px;font-weight:600;color:var(--navy-2);cursor:pointer">+ Add size</button>
+            <div id="simToggles" style="margin-top:14px"></div>
+          </div>
+          <div class="result">
+            <div class="reslabel">Result when booked</div>
+            <div id="simResult"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FLOWS -->
+      <section id="flows">
+        <h2><span class="num">08</span>Decision flowcharts</h2>
+        <p class="lead">The same logic, drawn out. Diamonds are checks; green boxes are outcomes.</p>
+        <div class="flowtabs" id="flowtabs">
+          <button data-flow="alloc" class="active">Allocation outcome</button>
+          <button data-flow="warehouse">Warehouse resolution</button>
+          <button data-flow="transfer">Parent → Child transfer</button>
+        </div>
+        <div class="flowwrap" id="flowwrap"></div>
+      </section>
+
+      <!-- SCENARIOS -->
+      <section id="scenarios">
+        <h2><span class="num">09</span>Scenario library</h2>
+        <p class="lead">Worked examples from the QA scenarios. Search or filter to confirm intended behavior.</p>
+        <div class="filterbar">
+          <input type="text" id="scenSearch" placeholder="Search, e.g. “backorder”, “parent”, “warehouse”, “zero”…">
+          <select id="scenFilter">
+            <option value="all">All groups</option>
+            <option value="Allocation">Allocation</option>
+            <option value="Parent transfer">Parent transfer</option>
+            <option value="Warehouse">Warehouse</option>
+            <option value="Store order">Store order</option>
+          </select>
+        </div>
+        <table>
+          <thead><tr><th style="width:120px">Group</th><th>Conditions</th><th style="width:330px">Outcome</th></tr></thead>
+          <tbody id="scenBody"></tbody>
+        </table>
+      </section>
+
+      <!-- QA -->
+      <section id="qa">
+        <h2><span class="num">10</span>QA test runner</h2>
+        <p class="lead">A live, trackable checklist of every auto-allocation and parent-transfer scenario, with expected outcomes computed from these same rules.</p>
+        <p><a class="barlink" style="border:1px solid var(--line);padding:9px 15px;border-radius:9px;display:inline-block" href="auto-allocation-qa.html">Open the Auto Allocation QA Runner →</a></p>
+      </section>
+
+      <!-- GLOSSARY -->
+      <section id="glossary">
+        <h2><span class="num">11</span>Glossary</h2>
+        <table><tbody>
+          <tr><td style="width:240px"><b>Auto allocation</b></td><td>The booking-time process that reserves stock per line and routes shortfalls to DropShip or Backorder.</td></tr>
+          <tr><td><b>Li Type</b></td><td>The product-level field that marks a product as Stock-eligible for allocation. (The line-item equivalent is the Matrix PO type / Source.)</td></tr>
+          <tr><td><b>Matrix PO type</b></td><td>The line-item value that says a size sources from <b>Stock</b> or <b>DropShip</b>, shown as <b>Source</b> on the order line.</td></tr>
+          <tr><td><b>Backorder mode</b></td><td>The “Allow No/Low Stock Allocation (Generate Backorder Quantity)” setting, keeps one Stock line and records shortfalls as backorders.</td></tr>
+          <tr><td><b>DropShip line</b></td><td>A new line item created for the shortfall, fulfilled by a vendor instead of from stock.</td></tr>
+          <tr><td><b>In-place flip</b></td><td>When nothing can be stocked, the original line itself becomes a DropShip line (no separate line created).</td></tr>
+          <tr><td><b>Share Parent Inventory</b></td><td>Child Product setting allowing a child to pull inventory from its parent at booking.</td></tr>
+          <tr><td><b>Warehouse types</b></td><td>Customer-owned, Distributor-owned (default), Vendor-owned. Parent→child transfers normally require a matching type.</td></tr>
+          <tr><td><b>Default warehouse</b></td><td>Admin ▸ Warehouses fallback used when the priority warehouses have no stock.</td></tr>
+        </tbody></table>
+      </section>
+
+      <div class="footer">
+        Auto Allocation Guide · QA &amp; Support reference · Describes intended system behavior.
+        Source: AutoAllocationInventoryModel + auto_allocation_caller, Transfer Parent Inventory To Child, and the QA scenario sets.
+      </div>
+    </main>
+  </div>
+
+<script>
+/* ============ Flowchart engine (shared with shipping guide) ============ */
+const LH = 13.5;
+function esc(s){ return s.replace(/&/g,'&amp;'); }
+function wrapText(text, maxChars){
+  const words = text.split(" "); const lines=[]; let cur="";
+  words.forEach(w=>{ if(cur && (cur+" "+w).length>maxChars){ lines.push(cur); cur=w; } else cur = cur ? cur+" "+w : w; });
+  if(cur) lines.push(cur); return lines;
+}
+function geom(n){
+  const w=n.w, innerW=n.type==="dec"?w*0.60:w-18;
+  const maxChars=Math.max(7,Math.floor(innerW/5.8));
+  const lines=wrapText(n.text,maxChars);
+  const minH=n.type==="dec"?54:(n.type==="start"?46:42);
+  const h=Math.max(minH, lines.length*LH+(n.type==="dec"?28:18));
+  return {x:n.x,y:n.y,w,h,lines,type:n.type};
+}
+function drawNode(n,g){
+  const cx=g.x+g.w/2, cy=g.y+g.h/2; let shape,color;
+  if(n.type==="dec"){ const pts=`${cx},${g.y} ${g.x+g.w},${cy} ${cx},${g.y+g.h} ${g.x},${cy}`; shape=`<polygon points="${pts}" fill="#fbf3e0" stroke="#d9b96a"/>`; color="#6b5418"; }
+  else if(n.type==="start"){ shape=`<rect x="${g.x}" y="${g.y}" width="${g.w}" height="${g.h}" rx="9" fill="#dfeafb" stroke="#9cc0e8"/>`; color="#274b6d"; }
+  else { shape=`<rect x="${g.x}" y="${g.y}" width="${g.w}" height="${g.h}" rx="9" fill="#e6f4ee" stroke="#9fd1ba"/>`; color="#0a5d43"; }
+  const startY=cy-(g.lines.length-1)*LH/2;
+  const txt=`<text x="${cx}" text-anchor="middle" font-size="11" fill="${color}" font-family="-apple-system,Segoe UI,sans-serif">`+
+    g.lines.map((l,i)=>`<tspan x="${cx}" y="${startY+i*LH+3.5}">${esc(l)}</tspan>`).join("")+`</text>`;
+  return shape+txt;
+}
+function anchor(g,side){ const cx=g.x+g.w/2, cy=g.y+g.h/2; if(side==="r")return[g.x+g.w,cy]; if(side==="l")return[g.x,cy]; if(side==="t")return[cx,g.y]; return[cx,g.y+g.h]; }
+function drawEdge(gF,gT,e){
+  const [x1,y1]=anchor(gF,e.from),[x2,y2]=anchor(gT,e.to);
+  const line=`<path d="M${x1},${y1} L${x2},${y2}" fill="none" stroke="#9aa7b8" stroke-width="1.4" marker-end="url(#arrow)"/>`;
+  let lbl="";
+  if(e.label){ const t=e.lt!=null?e.lt:0.45, lx=x1+(x2-x1)*t, ly=y1+(y2-y1)*t, wl=e.label.length*5.6+10;
+    lbl=`<rect x="${lx-wl/2}" y="${ly-9}" width="${wl}" height="16" rx="3" fill="#fff" opacity=".95"/>`+
+        `<text x="${lx}" y="${ly+3}" text-anchor="middle" font-size="10" fill="#5f6b7a" font-weight="600">${esc(e.label)}</text>`; }
+  return line+lbl;
+}
+function renderFlow(spec){
+  const G={}; spec.nodes.forEach(n=>G[n.id]=geom(n));
+  const defs=`<defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#9aa7b8"/></marker></defs>`;
+  return `<svg viewBox="0 0 ${spec.vb[0]} ${spec.vb[1]}" xmlns="http://www.w3.org/2000/svg">${defs}`+
+    spec.edges.map(e=>drawEdge(G[e.f],G[e.t],e)).join("")+spec.nodes.map(n=>drawNode(n,G[n.id])).join("")+`</svg>`;
+}
+const FLOWSPEC = {
+  alloc:{ vb:[1060,760], nodes:[
+    {id:"start",x:20,y:350,w:160,text:"Size row (required qty)",type:"start"},
+    {id:"d1",x:210,y:346,w:160,text:"Available stock ≥ required?",type:"dec"},
+    {id:"e1",x:450,y:40,w:200,text:"All Stock, reserve inventory",type:"end"},
+    {id:"dsp",x:430,y:346,w:160,text:"Some stock available? (partial)",type:"dec"},
+    {id:"d3",x:660,y:170,w:150,text:"Backorder mode ON?",type:"dec"},
+    {id:"e2",x:850,y:108,w:190,text:"Covered = Stock; shortfall = Backorder (bell)",type:"end"},
+    {id:"e3",x:850,y:238,w:190,text:"Covered = Stock; remainder → new DropShip line",type:"end"},
+    {id:"d4",x:660,y:450,w:150,text:"Backorder mode ON?",type:"dec"},
+    {id:"e4",x:850,y:390,w:190,text:"Stock qty 0; full qty = Backorder",type:"end"},
+    {id:"d5",x:655,y:580,w:160,text:"Every size on the line is zero?",type:"dec"},
+    {id:"e5",x:855,y:540,w:190,text:"Flip whole line to DropShip (in-place)",type:"end"},
+    {id:"e6",x:855,y:655,w:190,text:"Size removed; full qty → DropShip line",type:"end"}
+  ], edges:[
+    {f:"start",t:"d1",from:"r",to:"l"},
+    {f:"d1",t:"e1",from:"t",to:"l",label:"yes"},
+    {f:"d1",t:"dsp",from:"r",to:"l",label:"no"},
+    {f:"dsp",t:"d3",from:"t",to:"l",label:"partial"},
+    {f:"dsp",t:"d4",from:"b",to:"l",label:"all zero"},
+    {f:"d3",t:"e2",from:"t",to:"l",label:"yes"},
+    {f:"d3",t:"e3",from:"b",to:"l",label:"no"},
+    {f:"d4",t:"e4",from:"t",to:"l",label:"yes"},
+    {f:"d4",t:"d5",from:"b",to:"t",label:"no"},
+    {f:"d5",t:"e5",from:"r",to:"l",label:"yes"},
+    {f:"d5",t:"e6",from:"b",to:"l",label:"no"}
+  ]},
+  warehouse:{ vb:[780,900], nodes:[
+    {id:"start",x:40,y:20,w:220,text:"Resolve warehouse for the size",type:"start"},
+    {id:"p1",x:60,y:120,w:190,text:"Primary has stock?",type:"dec"},
+    {id:"a1",x:350,y:118,w:200,text:"Allocate from Primary",type:"end"},
+    {id:"p2",x:60,y:240,w:190,text:"Secondary has stock?",type:"dec"},
+    {id:"a2",x:350,y:238,w:200,text:"Allocate from Secondary",type:"end"},
+    {id:"p3",x:60,y:360,w:190,text:"Tertiary has stock?",type:"dec"},
+    {id:"a3",x:350,y:358,w:200,text:"Allocate from Tertiary",type:"end"},
+    {id:"s",x:55,y:480,w:200,text:"Search Warehouses for Stock = ON?",type:"dec"},
+    {id:"q",x:350,y:478,w:190,text:"Any other warehouse has stock?",type:"dec"},
+    {id:"aq",x:580,y:476,w:180,text:"Allocate from that warehouse",type:"end"},
+    {id:"def",x:60,y:620,w:190,text:"Default warehouse has stock?",type:"dec"},
+    {id:"ad",x:350,y:618,w:200,text:"Allocate from Default",type:"end"},
+    {id:"none",x:350,y:740,w:210,text:"No stock → DropShip / Backorder per allocation rules",type:"end"}
+  ], edges:[
+    {f:"start",t:"p1",from:"b",to:"t"},
+    {f:"p1",t:"a1",from:"r",to:"l",label:"yes"},{f:"p1",t:"p2",from:"b",to:"t",label:"no"},
+    {f:"p2",t:"a2",from:"r",to:"l",label:"yes"},{f:"p2",t:"p3",from:"b",to:"t",label:"no"},
+    {f:"p3",t:"a3",from:"r",to:"l",label:"yes"},{f:"p3",t:"s",from:"b",to:"t",label:"no"},
+    {f:"s",t:"q",from:"r",to:"l",label:"yes"},
+    {f:"q",t:"aq",from:"r",to:"l",label:"yes"},{f:"q",t:"def",from:"b",to:"r",label:"no"},
+    {f:"s",t:"def",from:"b",to:"t",label:"no"},
+    {f:"def",t:"ad",from:"r",to:"l",label:"yes"},{f:"def",t:"none",from:"b",to:"l",label:"no"}
+  ]},
+  transfer:{ vb:[1000,860], nodes:[
+    {id:"start",x:40,y:20,w:230,text:"Child line booking · Share Parent Inventory = ON",type:"start"},
+    {id:"d1",x:80,y:120,w:190,text:"Matrix PO type = Stock?",type:"dec"},
+    {id:"e0",x:360,y:118,w:190,text:"No transfer, line is DropShip",type:"end"},
+    {id:"d2",x:80,y:235,w:190,text:"Child stock ≥ required?",type:"dec"},
+    {id:"e1",x:360,y:233,w:190,text:"Child covers it, no transfer",type:"end"},
+    {id:"d3",x:80,y:350,w:190,text:"Parent has inventory?",type:"dec"},
+    {id:"e2",x:360,y:348,w:210,text:"No transfer → DropShip / Backorder rules",type:"end"},
+    {id:"d4",x:70,y:465,w:210,text:"Same warehouse type, or child stock = 0?",type:"dec"},
+    {id:"e3",x:360,y:463,w:210,text:"Transfer blocked (different warehouse type)",type:"end"},
+    {id:"act",x:90,y:590,w:190,text:"Transfer min(gap, parent) via FIFO lots → child",type:"end"},
+    {id:"d5",x:80,y:710,w:190,text:"Gap fully covered?",type:"dec"},
+    {id:"e4",x:360,y:688,w:210,text:"Child now covers required → Stock",type:"end"},
+    {id:"e5",x:360,y:768,w:210,text:"Partial transfer → remainder Backorder / DropShip",type:"end"}
+  ], edges:[
+    {f:"start",t:"d1",from:"b",to:"t"},
+    {f:"d1",t:"e0",from:"r",to:"l",label:"no"},{f:"d1",t:"d2",from:"b",to:"t",label:"yes"},
+    {f:"d2",t:"e1",from:"r",to:"l",label:"yes"},{f:"d2",t:"d3",from:"b",to:"t",label:"no"},
+    {f:"d3",t:"e2",from:"r",to:"l",label:"no"},{f:"d3",t:"d4",from:"b",to:"t",label:"yes"},
+    {f:"d4",t:"e3",from:"r",to:"l",label:"no"},{f:"d4",t:"act",from:"b",to:"t",label:"yes"},
+    {f:"act",t:"d5",from:"b",to:"t"},
+    {f:"d5",t:"e4",from:"r",to:"l",label:"yes"},{f:"d5",t:"e5",from:"b",to:"l",label:"no"}
+  ]}
+};
+function showFlow(k){ document.getElementById("flowwrap").innerHTML = renderFlow(FLOWSPEC[k]); }
+document.getElementById("flowtabs").addEventListener("click",e=>{
+  if(e.target.tagName!=="BUTTON")return;
+  document.querySelectorAll("#flowtabs button").forEach(b=>b.classList.remove("active"));
+  e.target.classList.add("active"); showFlow(e.target.dataset.flow);
+});
+showFlow("alloc");
+
+/* ============ Allocation logic (mirrors the model) ============ */
+function allocate(rows, o){
+  o=o||{}; const res={original:[],dropship:[],inPlaceFlip:false,transfers:[]};
+  if(o.noRecord && !o.defaultWarehouse){
+    res.inPlaceFlip=true; res.original=rows.map(r=>({size:r.size,qty:r.required,type:'DropShip'})); return res;
+  }
+  rows.forEach(r=>{
+    let stock=o.noRecord?0:r.stock, transferred=0;
+    if(o.parentTransfer && stock<r.required){
+      const allowed=o.sameWhType||stock===0;
+      if(allowed){ transferred=Math.min(r.required-stock, r.parentStock||0); stock+=transferred; }
+    }
+    r._alloc=Math.min(r.required,stock); r._rem=r.required-r._alloc;
+    if(transferred>0) res.transfers.push({size:r.size,qty:transferred});
+  });
+  if(o.backorder){ res.original=rows.map(r=>({size:r.size,qty:r._alloc,type:'Stock',backorder:r._rem})); return res; }
+  const kept=rows.filter(r=>r._alloc>0);
+  if(kept.length===0){ res.inPlaceFlip=true; res.original=rows.map(r=>({size:r.size,qty:r.required,type:'DropShip'})); return res; }
+  res.original=kept.map(r=>({size:r.size,qty:r._alloc,type:'Stock'}));
+  res.dropship=rows.filter(r=>r._rem>0).map(r=>({size:r.size,qty:r._rem}));
+  return res;
+}
+
+/* ============ Simulator ============ */
+const PRESETS = {
+  "SC-1":{rows:[["S",15,20],["M",30,50],["L",45,60]],f:{}},
+  "SC-2":{rows:[["S",15,3],["M",30,0],["L",45,39]],f:{}},
+  "SC-3":{rows:[["S",15,0],["M",30,14],["L",45,0]],f:{}},
+  "SC-4":{rows:[["S",10,0],["M",20,0]],f:{}},
+  "SC-5":{rows:[["S",15,6],["M",30,0]],f:{backorder:true}},
+  "SC-6":{rows:[["S",10,6,10]],f:{parentTransfer:true,sameWhType:true}}
+};
+let sim = { rows:[{size:"S",required:15,stock:3,parentStock:0},{size:"M",required:30,stock:0,parentStock:0},{size:"L",required:45,stock:39,parentStock:0}],
+  flags:{backorder:false,parentTransfer:false,sameWhType:true} };
+
+const SIMTOGGLES=[
+  {id:"backorder",label:"Backorder mode",sub:"Allow No/Low Stock Allocation (Generate Backorder Quantity)"},
+  {id:"parentTransfer",label:"Share Parent Inventory",sub:"Allow parent → child transfer at booking"},
+  {id:"sameWhType",label:"Parent & child same warehouse type",sub:"Bypassed when child stock = 0",dep:f=>f.parentTransfer}
+];
+
+function renderMatrix(){
+  const showP = sim.flags.parentTransfer;
+  document.querySelectorAll(".pcol").forEach(e=>e.style.display=showP?"":"none");
+  const b=document.getElementById("mxBody"); b.innerHTML="";
+  sim.rows.forEach((r,i)=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td><input class="size" data-i="${i}" data-k="size" value="${r.size}"></td>
+      <td><input type="number" min="0" data-i="${i}" data-k="required" value="${r.required}"></td>
+      <td><input type="number" min="0" data-i="${i}" data-k="stock" value="${r.stock}"></td>
+      <td class="pcol" style="display:${showP?'':'none'}"><input type="number" min="0" data-i="${i}" data-k="parentStock" value="${r.parentStock||0}"></td>
+      <td>${sim.rows.length>1?`<button class="rm" data-i="${i}" title="Remove">×</button>`:""}</td>`;
+    b.appendChild(tr);
+  });
+  b.querySelectorAll("input").forEach(inp=>inp.addEventListener("input",e=>{
+    const i=+e.target.dataset.i,k=e.target.dataset.k;
+    sim.rows[i][k] = k==="size" ? e.target.value : Math.max(0,parseInt(e.target.value||"0",10));
+    renderResult();
+  }));
+  b.querySelectorAll(".rm").forEach(btn=>btn.addEventListener("click",e=>{ sim.rows.splice(+e.target.dataset.i,1); renderMatrix(); renderResult(); }));
+}
+function renderSimToggles(){
+  const host=document.getElementById("simToggles"); host.innerHTML="";
+  SIMTOGGLES.forEach(t=>{
+    const active=!t.dep||t.dep(sim.flags);
+    const row=document.createElement("div");
+    row.className="toggle-row"+(active?"":" disabled");
+    row.innerHTML=`<div class="lbl">${t.label}<small>${t.sub}</small></div>
+      <label class="sw"><input type="checkbox" ${sim.flags[t.id]?"checked":""} ${active?"":"disabled"}><span></span></label>`;
+    row.querySelector("input").addEventListener("change",e=>{ sim.flags[t.id]=e.target.checked; renderSimToggles(); renderMatrix(); renderResult(); });
+    host.appendChild(row);
+  });
+}
+function lineRows(arr,flip){
+  return arr.map(r=>{
+    const type=r.type||(flip?'DropShip':'Stock');
+    const bell=(r.backorder&&r.backorder>0)?`<span class="bell">🔔 backorder ${r.backorder}</span>`:"";
+    return `<div class="lrow"><span class="sz">${esc(r.size)}</span><span>${r.qty}</span><span><span class="tp ${type.toLowerCase()}">${type}</span>${bell}</span></div>`;
+  }).join("");
+}
+function matchScenario(o,res){
+  // tiny helper to surface a matching SC id
+  for(const id of Object.keys(PRESETS)){
+    const p=PRESETS[id];
+    const rowsEq = p.rows.length===sim.rows.length && p.rows.every((pr,i)=>pr[0]===sim.rows[i].size && pr[1]===sim.rows[i].required && pr[2]===sim.rows[i].stock && (pr[3]||0)===(sim.rows[i].parentStock||0));
+    const fEq = ["backorder","parentTransfer","sameWhType"].every(k=>(!!p.f[k])===(!!o[k]) || (k==="sameWhType"&&!o.parentTransfer));
+    if(rowsEq && fEq) return id;
+  }
+  return null;
+}
+function renderResult(){
+  const o=sim.flags, res=allocate(sim.rows.map(r=>({...r})), o);
+  let html="";
+  const origTitle = res.inPlaceFlip ? "Original line item, flipped to DropShip (in-place)" : "Original line item";
+  html += `<div class="linecard${res.inPlaceFlip?' flip':''}"><h6>${origTitle}</h6>${lineRows(res.original,res.inPlaceFlip)}</div>`;
+  if(res.dropship.length){
+    html += `<div class="linecard ds"><h6>New DropShip line item</h6>${lineRows(res.dropship,true)}</div>`;
+  }
+  if(res.transfers.length){
+    html += `<div class="xfer"><b>Parent → child transfer:</b> ${res.transfers.map(t=>t.size+" +"+t.qty).join(", ")} pulled from the parent into the child.</div>`;
+  }
+  // explanation
+  let why;
+  if(res.inPlaceFlip) why = "No size had any stock → nothing to reserve, so the entire line flips to DropShip in place.";
+  else if(o.backorder) why = "Backorder mode is ON → one Stock line is kept; any shortfall is stored as a backorder (bell). No DropShip line is created.";
+  else if(res.dropship.length) why = "Partial stock → covered quantities stay as Stock on the original line; the shortfall (and any zero-stock sizes) move to a new DropShip line.";
+  else why = "Stock fully covers every size → the line stays Stock and inventory is reserved.";
+  html += `<div class="simwhy"><b>What happened:</b> ${why}</div>`;
+  const m=matchScenario(o,o); if(m) html += `<div class="matchhint">Matches scenario ${m}</div>`;
+  document.getElementById("simResult").innerHTML=html;
+}
+document.getElementById("addRow").addEventListener("click",()=>{ sim.rows.push({size:"?",required:0,stock:0,parentStock:0}); renderMatrix(); renderResult(); });
+document.getElementById("presets").addEventListener("click",e=>{
+  if(e.target.tagName!=="BUTTON")return;
+  const p=PRESETS[e.target.dataset.p]; if(!p)return;
+  sim.rows=p.rows.map(r=>({size:r[0],required:r[1],stock:r[2],parentStock:r[3]||0}));
+  sim.flags={backorder:false,parentTransfer:false,sameWhType:true};
+  Object.keys(p.f).forEach(k=>sim.flags[k]=p.f[k]);
+  renderMatrix(); renderSimToggles(); renderResult();
+});
+renderMatrix(); renderSimToggles(); renderResult();
+
+/* ============ Scenario library ============ */
+const SCEN=[
+  ["Allocation","All sizes fully stocked (S/M/L)","Line stays Stock; inventory reserved. No DropShip line. (SC-1)"],
+  ["Allocation","Mixed, S partial, M zero, L partial","Original: S & L Stock (covered qty). New DropShip line: S/M/L remainders. (SC-2)"],
+  ["Allocation","S zero, M partial, L no inventory","Original: M Stock only. DropShip line: S, M remainder, L. (SC-3)"],
+  ["Allocation","All sizes zero stock","No size can be stocked → whole line flips to DropShip in-place. (SC-4)"],
+  ["Allocation","Backorder mode ON · partial stock","One Stock line kept; shortfall stored as backorder (bell). No DropShip line. Zero rows kept. (SC-5)"],
+  ["Parent transfer","Share Parent Inventory ON · parent covers the gap","Transfer fills the child; line stays Stock. No DropShip line. (SC-6)"],
+  ["Warehouse","No inventory record · Default warehouse · Backorder mode","Falls back to Default warehouse; full qty backordered. No DropShip line. (SC-7)"],
+  ["Warehouse","No inventory record · no Default warehouse","Row flips to DropShip in-place on the original line. (SC-8)"],
+  ["Warehouse","Customer primary has stock vs. global priority","Allocated from the customer primary warehouse; global priority never consulted. (SC-9)"],
+  ["Store order","Aether Store Order · system auto-alloc OFF · zero stock","Special path: full qty backordered even though system auto-alloc is OFF. (SC-10)"],
+  ["Store order","Aether Store Order · system auto-alloc ON","Standard allocation path applies. (SC-11)"],
+  ["Parent transfer","Child has enough (childQty ≥ order)","Early return, parent untouched. (Transfer 1)"],
+  ["Parent transfer","Parent covers the shortfall exactly","min(required, parent) transferred; child reaches order qty. (Transfer 2)"],
+  ["Parent transfer","Parent has more than enough","Only the shortfall is taken; parent keeps the rest. (Transfer 3)"],
+  ["Parent transfer","Parent has less than required","Partial transfer; remainder implied as backorder. (Transfer 4)"],
+  ["Parent transfer","Child zero, parent covers","Full required transferred from parent → child. (Transfer 5)"],
+  ["Parent transfer","Parent has zero inventory","Early return; child keeps its own qty. (Transfer 6)"],
+  ["Parent transfer","Multiple FIFO lots, parent covers","Taken oldest-first across lots; weighted-average cost. (Transfer 7)"],
+  ["Parent transfer","Multiple FIFO lots, parent partially covers","Partial across lots; remainder backordered. (Transfer 8)"],
+  ["Parent transfer","Matrix PO type = Dropship","No transfer (early return). (Transfer 9)"],
+  ["Parent transfer","No FIFO lots returned","No transfer (early return). (Transfer 10)"],
+  ["Parent transfer","Different warehouse type & child has stock","Transfer blocked, types must match unless child stock is 0."]
+];
+function renderScen(){
+  const q=document.getElementById("scenSearch").value.toLowerCase();
+  const filt=document.getElementById("scenFilter").value;
+  const body=document.getElementById("scenBody");
+  body.innerHTML=SCEN.filter(r=>{
+    const matchQ=(r[0]+" "+r[1]+" "+r[2]).toLowerCase().includes(q);
+    const matchF=filt==="all"||r[0]===filt; return matchQ&&matchF;
+  }).map(r=>`<tr><td><span class="badge">${r[0]}</span></td><td>${r[1]}</td><td><span class="addr-chip">${r[2]}</span></td></tr>`).join("")
+    || `<tr><td colspan="3" style="color:var(--muted);text-align:center;padding:22px">No scenarios match.</td></tr>`;
+}
+document.getElementById("scenSearch").addEventListener("input",renderScen);
+document.getElementById("scenFilter").addEventListener("change",renderScen);
+renderScen();
+</script>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PO Shipping QA Test Runner — Antera Documentation</title>
+<title>PO Shipping QA Test Runner · Antera Documentation</title>
 <link rel="stylesheet" href="assets/styles.css">
 <style>
   /* ---- QA-runner specific styles ---- */
@@ -108,7 +108,7 @@
       <section id="tests">
         <h2><span class="num">02</span>Test scenarios</h2>
         <div class="qa-toolbar">
-          <input type="text" id="search" placeholder="Search tests — id, conditions, expected result…">
+          <input type="text" id="search" placeholder="Search tests, id, conditions, expected result…">
           <select id="fSection"><option value="all">All sections</option></select>
           <select id="fStatus">
             <option value="all">All statuses</option>
@@ -129,7 +129,7 @@
 
       <div class="footer">
         PO Shipping QA Test Runner · Antera QA &amp; Support · Expected results are generated from the documented determination rules.
-        Results are stored locally in this browser — export to share a run.
+        Results are stored locally in this browser, export to share a run.
       </div>
     </main>
   </div>
@@ -138,13 +138,13 @@
 /* ===================== Determination rules engine =====================
    Kept in sync with shipping.html so "expected" can be computed live. */
 const ADDR = {
-  order:        {name:"Order Shipping Address", source:"Order — customer address on the order"},
+  order:        {name:"Order Shipping Address", source:"Order, customer address on the order"},
   alternate:    {name:"Alternate Ship To Address", source:"Alternate Ship To override fields"},
   firstDecorator:{name:"First Decorator Address", source:"First decorator vendor's shipping address"},
   secondBeyond: {name:"Second & Beyond Decorator", source:"Next decorator vendor in the chain"},
   warehouse:    {name:"Destination Warehouse", source:"Configured Destination Warehouse address"},
   corpIdentity: {name:"Corporate Identity Address", source:"Corporate Identity on the account"},
-  partner:      {name:"Partner Address", source:"System — your Partner Company record"}
+  partner:      {name:"Partner Address", source:"System, your Partner Company record"}
 };
 const SHIPFROM = {
   blank:     "Blank Supplier (Vendor record)",
@@ -207,10 +207,10 @@ const SCEN = [
    order:"https://prd.anterasaas.com/e-commerce/orders/99442fdb-5926-11f1-9447-0e9649c979d9"},
   {id:"A-06",sec:"A",title:"No decoration, No Alternate, default flow",doc:"blank",flags:{decorated:false},
    cond:["Decorated = No","Alternate = No","Ship to Us = No"],order:"https://prd.anterasaas.com/e-commerce/orders/d3859e9c-5926-11f1-9447-0e9649c979d9"},
-  {id:"A-07",sec:"A",title:"Ship to Us, cloned line item WITHOUT Ship to Us (split)",manualExpected:"Split shipment — line with Ship to Us goes to Us; the cloned line (Ship to Us = No) goes to the Decorator.",
+  {id:"A-07",sec:"A",title:"Ship to Us, cloned line item WITHOUT Ship to Us (split)",manualExpected:"Split shipment, line with Ship to Us goes to Us; the cloned line (Ship to Us = No) goes to the Decorator.",
    cond:["Decorated = No","Ship to Us Instead of Decorator = Yes","Cloned line item with Ship to Us = No"],
    order:"https://prd.anterasaas.com/e-commerce/orders/9ddab630-5aae-11f1-9447-0e9649c979d9"},
-  {id:"A-08",sec:"A",title:"Customer Portal — Ship to Us on only one line item (split)",manualExpected:"Split shipment — the Ship-to-Us line goes to Us; the other line ships to the Decorator.",
+  {id:"A-08",sec:"A",title:"Customer Portal, Ship to Us on only one line item (split)",manualExpected:"Split shipment, the Ship-to-Us line goes to Us; the other line ships to the Decorator.",
    cond:["Customer Portal order","Decorated = No","Ship to Us Instead of Decorator = Yes (1 line item)"]},
   {id:"A-09",sec:"A",title:"Not decorated, Ship to Us Upon Completion, Destination Warehouse",doc:"blank",flags:{decorated:false,shipToUsUponCompletion:true,destWarehouse:true},
    cond:["Decorated = No","Alternate = No","Ship to Us Upon Completion = Yes","Destination Warehouse = Yes"]},
@@ -258,15 +258,15 @@ const SCEN = [
    cond:["Alternate = No","Additional Vendors = No","Ship to Us Upon Completion = No"],order:"https://prd.anterasaas.com/e-commerce/orders/196d7eeb-5943-11f1-9447-0e9649c979d9"},
 
   // ---- D: Field Mapping Validation ----
-  {id:"D-01",sec:"D",title:"Supplier PO ships to Decorator — field mapping",manualExpected:"All fields populate from the VENDOR source: accountName, email, shipAddress1, shipAddress2 (cond.), shipCity, shipState, shipPostalCode, shipCountry.",cond:["Standard order","Source = Vendor"]},
-  {id:"D-02",sec:"D",title:"Decorator PO ships to Customer — field mapping",manualExpected:"Fields populate from the ORDER source: shippingCustomerName, shippingCompanyName, shippingCustomerEmail, shippingStreet, shippingStreet2 (cond.), shippingCity, shippingState, shippingPostalCode, shippingCountry, shippingPhone (cond.).",cond:["Standard order","Source = Order (Customer)"]},
-  {id:"D-03",sec:"D",title:"Ship to Us — Corporate Identity NOT used — field mapping",manualExpected:"Fields populate from the PARTNER COMPANY source: Partner Company, Partner Address, Partner Address 2 (cond.), Partner City, Partner State, Partner Postal Code, Partner Country, Partner Phone.",cond:["Ship to Us","Source = Partner Company"]},
-  {id:"D-04",sec:"D",title:"Ship to Us — Corporate Identity IS used — field mapping",manualExpected:"Fields populate from the CORPORATE IDENTITY source: Corporate Identity Name, Shipping Street, Shipping City, Shipping State, Shipping Postal Code, Shipping Country, Phone.",cond:["Ship to Us","Source = Corporate Identity"]},
-  {id:"D-05",sec:"D",title:"Alternate Ship To — field mapping",manualExpected:"Fields populate from the ALTERNATE SHIP TO source: accountName, email, shipAddress1, shipAddress2 (cond.), shipCity, shipState, shipPostalCode, shipCountry, shipPhone (cond.).",cond:["Source = Alternate Ship To"]},
-  {id:"D-06",sec:"D",title:"Store Order — Decorator PO ships to Store Customer — field mapping",manualExpected:"Fields populate from the ORDER source with store prefixes: storeShippingAttentionTo, storeShippingCompanyName, storeShippingContactEmail, shippingStreet, shippingStreet2 (cond.), shippingCity, shippingState, shippingPostalCode, shippingCountry, shippingPhone (cond.).",cond:["Store order","Source = Order (Store Customer)"]},
-  {id:"D-07",sec:"D",title:"Address Line 2 — conditional display",manualExpected:"Address Line 2 / shipAddress2 / shippingStreet2 displays when present; field is completely omitted (no blank line) when empty/null.",cond:["Display rule"]},
-  {id:"D-08",sec:"D",title:"Phone — conditional display",manualExpected:"Phone / shippingPhone / shipPhone displays when present; field is completely omitted when empty/null.",cond:["Display rule"]},
-  {id:"D-09",sec:"D",title:"Email — display when available",manualExpected:"Email displays whenever available from the source.",cond:["Display rule"]},
+  {id:"D-01",sec:"D",title:"Supplier PO ships to Decorator, field mapping",manualExpected:"All fields populate from the VENDOR source: accountName, email, shipAddress1, shipAddress2 (cond.), shipCity, shipState, shipPostalCode, shipCountry.",cond:["Standard order","Source = Vendor"]},
+  {id:"D-02",sec:"D",title:"Decorator PO ships to Customer, field mapping",manualExpected:"Fields populate from the ORDER source: shippingCustomerName, shippingCompanyName, shippingCustomerEmail, shippingStreet, shippingStreet2 (cond.), shippingCity, shippingState, shippingPostalCode, shippingCountry, shippingPhone (cond.).",cond:["Standard order","Source = Order (Customer)"]},
+  {id:"D-03",sec:"D",title:"Ship to Us, Corporate Identity NOT used, field mapping",manualExpected:"Fields populate from the PARTNER COMPANY source: Partner Company, Partner Address, Partner Address 2 (cond.), Partner City, Partner State, Partner Postal Code, Partner Country, Partner Phone.",cond:["Ship to Us","Source = Partner Company"]},
+  {id:"D-04",sec:"D",title:"Ship to Us, Corporate Identity IS used, field mapping",manualExpected:"Fields populate from the CORPORATE IDENTITY source: Corporate Identity Name, Shipping Street, Shipping City, Shipping State, Shipping Postal Code, Shipping Country, Phone.",cond:["Ship to Us","Source = Corporate Identity"]},
+  {id:"D-05",sec:"D",title:"Alternate Ship To, field mapping",manualExpected:"Fields populate from the ALTERNATE SHIP TO source: accountName, email, shipAddress1, shipAddress2 (cond.), shipCity, shipState, shipPostalCode, shipCountry, shipPhone (cond.).",cond:["Source = Alternate Ship To"]},
+  {id:"D-06",sec:"D",title:"Store Order, Decorator PO ships to Store Customer, field mapping",manualExpected:"Fields populate from the ORDER source with store prefixes: storeShippingAttentionTo, storeShippingCompanyName, storeShippingContactEmail, shippingStreet, shippingStreet2 (cond.), shippingCity, shippingState, shippingPostalCode, shippingCountry, shippingPhone (cond.).",cond:["Store order","Source = Order (Store Customer)"]},
+  {id:"D-07",sec:"D",title:"Address Line 2, conditional display",manualExpected:"Address Line 2 / shipAddress2 / shippingStreet2 displays when present; field is completely omitted (no blank line) when empty/null.",cond:["Display rule"]},
+  {id:"D-08",sec:"D",title:"Phone, conditional display",manualExpected:"Phone / shippingPhone / shipPhone displays when present; field is completely omitted when empty/null.",cond:["Display rule"]},
+  {id:"D-09",sec:"D",title:"Email, display when available",manualExpected:"Email displays whenever available from the source.",cond:["Display rule"]},
 
   // ---- E: Multi-Decoration Chain ----
   {id:"E-01",sec:"E",title:"1 line item, 2 artworks from different vendors",manualExpected:"Chain: Supplier → Deco Vendor 1 → Deco Vendor 2 → Customer. Supplier PO → Deco 1; Deco 1 PO → Deco 2; Deco 2 PO → Customer.",cond:["1 line item","2 decorations, 2 vendors"]},
@@ -282,28 +282,28 @@ const SCEN = [
    cond:["Alternate = No","Ship to Us = No (both toggles)"]},
 
   // ---- G: Store Orders ----
-  {id:"G-01",sec:"G",title:"Store order — Supplier + Decorator PO default flow",manualExpected:"Supplier PO ships from Vendor; Decorator PO ships to Store Customer using store-specific fields.",cond:["Store order","No overrides"]},
-  {id:"G-02",sec:"G",title:"Store order — Supplier PO only",manualExpected:"Supplier PO ships to Store Customer using store-specific fields.",cond:["Store order","No decoration"]},
-  {id:"G-03",sec:"G",title:"Store order — Ship to Us logic",manualExpected:"Same Ship-to-Us logic as standard orders, with store-order field mappings.",cond:["Store order","Ship to Us enabled"]},
-  {id:"G-04",sec:"G",title:"Store order — Alternate Ship To logic",manualExpected:"Same Alternate logic as standard orders, with store-order field mappings.",cond:["Store order","Alternate Ship To enabled"]},
+  {id:"G-01",sec:"G",title:"Store order, Supplier + Decorator PO default flow",manualExpected:"Supplier PO ships from Vendor; Decorator PO ships to Store Customer using store-specific fields.",cond:["Store order","No overrides"]},
+  {id:"G-02",sec:"G",title:"Store order, Supplier PO only",manualExpected:"Supplier PO ships to Store Customer using store-specific fields.",cond:["Store order","No decoration"]},
+  {id:"G-03",sec:"G",title:"Store order, Ship to Us logic",manualExpected:"Same Ship-to-Us logic as standard orders, with store-order field mappings.",cond:["Store order","Ship to Us enabled"]},
+  {id:"G-04",sec:"G",title:"Store order, Alternate Ship To logic",manualExpected:"Same Alternate logic as standard orders, with store-order field mappings.",cond:["Store order","Alternate Ship To enabled"]},
 
   // ---- H: Edge Case / Negative ----
-  {id:"H-01",sec:"H",title:"Missing Address Line 2 — verify field omission",manualExpected:"Address Line 2 does not appear on the PO at all (no blank line).",cond:["Address Line 2 null/empty"]},
-  {id:"H-02",sec:"H",title:"Missing Phone — verify field omission",manualExpected:"Phone field does not appear on the PO at all.",cond:["Phone null/empty"]},
+  {id:"H-01",sec:"H",title:"Missing Address Line 2, verify field omission",manualExpected:"Address Line 2 does not appear on the PO at all (no blank line).",cond:["Address Line 2 null/empty"]},
+  {id:"H-02",sec:"H",title:"Missing Phone, verify field omission",manualExpected:"Phone field does not appear on the PO at all.",cond:["Phone null/empty"]},
   {id:"H-03",sec:"H",title:"No decoration, no Alternate, no Ship to Us",doc:"blank",flags:{decorated:false},
    cond:["All override flags = No","Decorated = No"]},
-  {id:"H-04",sec:"H",title:"Decorated but no decorator vendor address configured",manualExpected:"System handles gracefully — error message or fallback (no silently wrong address).",cond:["Decorated = Yes","Decorator vendor has no shipping address"]},
-  {id:"H-05",sec:"H",title:"Corporate Identity with incomplete address",manualExpected:"System handles gracefully — validation error or fallback.",cond:["Corporate Identity = Yes","Address missing required fields"]},
-  {id:"H-06",sec:"H",title:"Destination Warehouse with no address configured",manualExpected:"System handles gracefully — error message or fallback.",cond:["Destination Warehouse = Yes","No warehouse address configured"]},
+  {id:"H-04",sec:"H",title:"Decorated but no decorator vendor address configured",manualExpected:"System handles gracefully, error message or fallback (no silently wrong address).",cond:["Decorated = Yes","Decorator vendor has no shipping address"]},
+  {id:"H-05",sec:"H",title:"Corporate Identity with incomplete address",manualExpected:"System handles gracefully, validation error or fallback.",cond:["Corporate Identity = Yes","Address missing required fields"]},
+  {id:"H-06",sec:"H",title:"Destination Warehouse with no address configured",manualExpected:"System handles gracefully, error message or fallback.",cond:["Destination Warehouse = Yes","No warehouse address configured"]},
   {id:"H-07",sec:"H",title:"Multiple shipping addresses on order (multi-ship)",manualExpected:"Each PO references the correct shipping address for its respective line items.",cond:["Order has multiple shipping addresses"]},
 
   // ---- P: Cloning & Customer Portal (multi-vendor) ----
-  {id:"P-01",sec:"P",title:"Cloned line item — same garment vendor, different decoration vendor",manualExpected:"Decoration hands off in sequence: Supplier → First Decorator → Next Decorator → Customer. The Blank PO sends the goods to the first decorator, then on to the next.",cond:["Cloned line item","Same garment vendor","Different decoration vendor"]},
-  {id:"P-02",sec:"P",title:"Customer-portal order — same garment vendor, different decoration vendor",manualExpected:"Same chain as a cloned line: Supplier → First Decorator → Next Decorator → Customer.",cond:["Customer Portal order","Same garment vendor","Different decoration vendor"]},
-  {id:"P-03",sec:"P",title:"Cloned line — different decoration vendor + Alternate Ship To",manualExpected:"Earlier POs still hand off decorator → decorator; only the FINAL decorator PO ships to the Alternate Ship To Address.",cond:["Cloned line item","Different decoration vendor","Alternate Ship To = Yes"]},
-  {id:"P-04",sec:"P",title:"Cloned line — different decoration vendor + Ship to Us",manualExpected:"Earlier POs hand off decorator → decorator; the FINAL decorator PO follows Ship-to-Us (Warehouse → Corporate Identity → Partner).",cond:["Cloned line item","Different decoration vendor","Ship to Us = Yes"]},
-  {id:"P-05",sec:"P",title:"Customer-portal — different decoration vendor + Alternate Ship To",manualExpected:"Earlier POs hand off decorator → decorator; the FINAL decorator PO ships to the Alternate Ship To Address.",cond:["Customer Portal order","Different decoration vendor","Alternate Ship To = Yes"]},
-  {id:"P-06",sec:"P",title:"Customer-portal — different decoration vendor + Ship to Us",manualExpected:"Earlier POs hand off decorator → decorator; the FINAL decorator PO follows Ship-to-Us (Warehouse → Corporate Identity → Partner).",cond:["Customer Portal order","Different decoration vendor","Ship to Us = Yes"]}
+  {id:"P-01",sec:"P",title:"Cloned line item, same garment vendor, different decoration vendor",manualExpected:"Decoration hands off in sequence: Supplier → First Decorator → Next Decorator → Customer. The Blank PO sends the goods to the first decorator, then on to the next.",cond:["Cloned line item","Same garment vendor","Different decoration vendor"]},
+  {id:"P-02",sec:"P",title:"Customer-portal order, same garment vendor, different decoration vendor",manualExpected:"Same chain as a cloned line: Supplier → First Decorator → Next Decorator → Customer.",cond:["Customer Portal order","Same garment vendor","Different decoration vendor"]},
+  {id:"P-03",sec:"P",title:"Cloned line, different decoration vendor + Alternate Ship To",manualExpected:"Earlier POs still hand off decorator → decorator; only the FINAL decorator PO ships to the Alternate Ship To Address.",cond:["Cloned line item","Different decoration vendor","Alternate Ship To = Yes"]},
+  {id:"P-04",sec:"P",title:"Cloned line, different decoration vendor + Ship to Us",manualExpected:"Earlier POs hand off decorator → decorator; the FINAL decorator PO follows Ship-to-Us (Warehouse → Corporate Identity → Partner).",cond:["Cloned line item","Different decoration vendor","Ship to Us = Yes"]},
+  {id:"P-05",sec:"P",title:"Customer-portal, different decoration vendor + Alternate Ship To",manualExpected:"Earlier POs hand off decorator → decorator; the FINAL decorator PO ships to the Alternate Ship To Address.",cond:["Customer Portal order","Different decoration vendor","Alternate Ship To = Yes"]},
+  {id:"P-06",sec:"P",title:"Customer-portal, different decoration vendor + Ship to Us",manualExpected:"Earlier POs hand off decorator → decorator; the FINAL decorator PO follows Ship-to-Us (Warehouse → Corporate Identity → Partner).",cond:["Customer Portal order","Different decoration vendor","Ship to Us = Yes"]}
 ];
 
 /* ===================== State (localStorage) ===================== */
@@ -321,7 +321,7 @@ function expectedHtml(s){
     return `<div class="exp"><span class="lab">Expected ships to</span><b>${e.to}</b><span class="live" title="Computed live from the determination rules">computed</span></div>`+
            `<div class="frm">Ships from: ${e.from} · Source: ${e.source}</div>`;
   }
-  return `<div class="exp"><span class="lab">Expected</span>${s.manualExpected||"—"}</div>`;
+  return `<div class="exp"><span class="lab">Expected</span>${s.manualExpected||"-"}</div>`;
 }
 function expectedText(s){
   if(s.doc && s.flags && !s.manualExpected){ const e=computeExpected(s.doc,s.flags); return "Ships from "+e.from+" → "+e.to; }
@@ -444,7 +444,7 @@ document.getElementById("impFile").addEventListener("change",e=>{
       const res=data.results||data;
       Object.keys(res).forEach(id=>{ if(res[id]) store[id]={status:res[id].status||"untested",notes:res[id].notes||""}; });
       save(); refresh(); alert("Imported results.");
-    }catch(err){ alert("Could not read that file — expected a JSON export from this page."); }
+    }catch(err){ alert("Could not read that file, expected a JSON export from this page."); }
     e.target.value="";
   };
   reader.readAsText(f);

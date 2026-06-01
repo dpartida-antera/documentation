@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auto Allocation QA Runner · Antera Documentation</title>
+<link rel="stylesheet" href="assets/styles.css">
+<style>
+  .qa-summary{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin:18px 0 6px}
+  .qa-stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px 14px;text-align:center}
+  .qa-stat .n{font-size:26px;font-weight:800;line-height:1}
+  .qa-stat .l{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-top:5px;font-weight:700}
+  .qa-stat.pass .n{color:#0a8a4f}.qa-stat.fail .n{color:#c83838}.qa-stat.blocked .n{color:#b5820a}
+  .qa-stat.untested .n{color:#8895a8}.qa-stat.total .n{color:var(--navy)}.qa-stat.pct .n{color:var(--blue)}
+  .progress{height:10px;border-radius:6px;background:#eef1f5;overflow:hidden;margin:10px 0 4px;display:flex}
+  .progress span{height:100%;display:block}
+  .progress .p{background:#34b878}.progress .f{background:#e05858}.progress .b{background:#e6b53c}
+  .seclegend{display:flex;flex-wrap:wrap;gap:7px;margin:12px 0 0}
+  .seclegend .s{font-size:11.5px;border:1px solid var(--line);border-radius:20px;padding:4px 11px;color:var(--muted);cursor:pointer;background:var(--card)}
+  .seclegend .s b{color:var(--navy-2)}
+  .qa-toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:22px 0 14px}
+  .qa-toolbar input[type=text],.qa-toolbar select{padding:9px 12px;border:1px solid var(--line);border-radius:9px;font-size:13.5px;background:var(--card)}
+  .qa-toolbar input[type=text]{flex:1;min-width:200px}
+  .qa-toolbar .btn{padding:9px 13px;border:1px solid var(--line);border-radius:9px;background:var(--card);font-size:13px;font-weight:600;color:var(--navy-2);cursor:pointer}
+  .qa-toolbar .btn:hover{border-color:var(--blue);color:var(--blue)}
+  .qa-toolbar .btn.danger:hover{border-color:#c83838;color:#c83838}
+  .sec-head{margin:26px 0 10px;display:flex;align-items:baseline;gap:10px}
+  .sec-head h3{margin:0;font-size:16px;color:var(--navy)}
+  .sec-head .sc{font-size:12px;color:var(--muted)}
+  .scn{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:15px 17px;margin-bottom:11px;border-left:4px solid #cdd6e2}
+  .scn.s-pass{border-left-color:#34b878}.scn.s-fail{border-left-color:#e05858}.scn.s-blocked{border-left-color:#e6b53c}
+  .scn .top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
+  .scn .tid{font-weight:800;color:var(--navy);font-size:14px}
+  .scn .title{font-weight:600;font-size:14px;color:#2a3442}
+  .scn .cond{margin:9px 0 4px;font-size:13px;color:#46505e}
+  .scn .cond .chip{display:inline-block;background:#eef2f7;border-radius:6px;padding:2px 8px;margin:2px 4px 2px 0;font-size:12px;color:#3a4654}
+  .scn .exp{margin:9px 0 0;font-size:13.5px}
+  .scn .exp .lab{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:700;margin-right:6px}
+  .scn .exp .live{font-size:10.5px;background:#e7f0fb;color:#2f6fb0;border-radius:5px;padding:1px 6px;font-weight:700;margin-left:7px;vertical-align:middle}
+  .statusbtns{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+  .statusbtns button{border:1px solid var(--line);background:var(--card);padding:7px 14px;border-radius:8px;font-size:12.5px;font-weight:700;color:var(--muted);cursor:pointer}
+  .statusbtns button[data-s=untested].on{background:#eef1f5;color:#5a6675;border-color:#c3cdd9}
+  .statusbtns button[data-s=pass].on{background:#e6f6ee;color:#0a8a4f;border-color:#9ad8b8}
+  .statusbtns button[data-s=fail].on{background:#fdecec;color:#c83838;border-color:#f0b6b6}
+  .statusbtns button[data-s=blocked].on{background:#fdf6e3;color:#a9760a;border-color:#ecd595}
+  .scn textarea{width:100%;margin-top:10px;border:1px solid var(--line);border-radius:9px;padding:9px 11px;font-size:13px;font-family:inherit;resize:vertical;min-height:38px;box-sizing:border-box}
+  .scn textarea:focus{outline:none;border-color:var(--blue)}
+  .empty{color:var(--muted);text-align:center;padding:40px;font-size:14px}
+  @media(max-width:760px){.qa-summary{grid-template-columns:repeat(3,1fr)}}
+  @media print{.topbar,.qa-toolbar,.statusbtns,.docnav,.backlink{display:none!important}.scn{break-inside:avoid;border:1px solid #ccc}.doc-layout{display:block}}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand"><div class="logo">A</div><b>Antera Documentation</b><span>· Auto Allocation QA</span></div>
+    <div class="spacer"></div>
+    <a class="barlink" href="auto-allocation.html">Auto Allocation Guide</a>
+    <a class="barlink" href="index.html">← All guides</a>
+  </div>
+
+  <div class="doc-layout">
+    <aside class="docnav">
+      <a class="backlink" href="index.html">← All guides</a>
+      <div class="doctitle">Auto Allocation QA Runner</div>
+      <div class="docsub">Interactive regression checklist</div>
+      <nav>
+        <a class="section">Run</a>
+        <a href="#summary">Progress summary</a>
+        <a href="#tests">Test scenarios</a>
+        <a class="section">Related</a>
+        <a href="auto-allocation.html#tool">Allocation simulator</a>
+        <a href="auto-allocation.html#flows">Decision flowcharts</a>
+        <a href="auto-allocation.html#scenarios">Scenario library</a>
+      </nav>
+    </aside>
+
+    <main class="doc">
+      <div class="hero">
+        <h1>Auto Allocation QA Runner</h1>
+        <p>Every auto-allocation and parent-transfer scenario as a live, trackable checklist. <b>Expected outcomes are computed by the same rules engine the guide uses</b>, so the sheet can't drift. Mark each test, note the actual result, export a report.</p>
+        <span class="pill">Auto-saves in your browser · Export CSV / JSON</span>
+      </div>
+
+      <section id="summary">
+        <h2><span class="num">01</span>Progress summary</h2>
+        <div class="qa-summary">
+          <div class="qa-stat total"><div class="n" id="stTotal">0</div><div class="l">Total</div></div>
+          <div class="qa-stat pass"><div class="n" id="stPass">0</div><div class="l">Pass</div></div>
+          <div class="qa-stat fail"><div class="n" id="stFail">0</div><div class="l">Fail</div></div>
+          <div class="qa-stat blocked"><div class="n" id="stBlocked">0</div><div class="l">Blocked</div></div>
+          <div class="qa-stat untested"><div class="n" id="stUntested">0</div><div class="l">Not tested</div></div>
+          <div class="qa-stat pct"><div class="n" id="stPct">0%</div><div class="l">Executed</div></div>
+        </div>
+        <div class="progress" id="progress" title="Pass / Fail / Blocked"></div>
+        <div class="seclegend" id="seclegend"></div>
+      </section>
+
+      <section id="tests">
+        <h2><span class="num">02</span>Test scenarios</h2>
+        <div class="qa-toolbar">
+          <input type="text" id="search" placeholder="Search tests, id, conditions, outcome…">
+          <select id="fSection"><option value="all">All groups</option></select>
+          <select id="fStatus">
+            <option value="all">All statuses</option>
+            <option value="untested">Not tested</option>
+            <option value="pass">Pass</option>
+            <option value="fail">Fail</option>
+            <option value="blocked">Blocked</option>
+          </select>
+          <button class="btn" id="expCsv">Export CSV</button>
+          <button class="btn" id="expJson">Export JSON</button>
+          <button class="btn" id="impBtn">Import JSON</button>
+          <button class="btn" id="printBtn">Print</button>
+          <button class="btn danger" id="resetBtn">Reset all</button>
+          <input type="file" id="impFile" accept="application/json" style="display:none">
+        </div>
+        <div id="list"></div>
+      </section>
+
+      <div class="footer">
+        Auto Allocation QA Runner · Antera QA &amp; Support · Expected outcomes generated from the documented allocation + transfer rules.
+        Results are stored locally in this browser, export to share a run.
+      </div>
+    </main>
+  </div>
+
+<script>
+/* ===================== Rules engine (mirrors the guide) ===================== */
+function allocate(rows, o){
+  o=o||{}; const res={original:[],dropship:[],inPlaceFlip:false,transfers:[]};
+  if(o.noRecord && !o.defaultWarehouse){ res.inPlaceFlip=true; res.original=rows.map(r=>({size:r.size,qty:r.required,type:'DropShip'})); return res; }
+  rows.forEach(r=>{
+    let stock=o.noRecord?0:r.stock, transferred=0;
+    if(o.parentTransfer && stock<r.required){ const allowed=o.sameWhType||stock===0; if(allowed){ transferred=Math.min(r.required-stock,r.parentStock||0); stock+=transferred; } }
+    r._alloc=Math.min(r.required,stock); r._rem=r.required-r._alloc;
+    if(transferred>0) res.transfers.push({size:r.size,qty:transferred});
+  });
+  if(o.backorder){ res.original=rows.map(r=>({size:r.size,qty:r._alloc,type:'Stock',backorder:r._rem})); return res; }
+  const kept=rows.filter(r=>r._alloc>0);
+  if(kept.length===0){ res.inPlaceFlip=true; res.original=rows.map(r=>({size:r.size,qty:r.required,type:'DropShip'})); return res; }
+  res.original=kept.map(r=>({size:r.size,qty:r._alloc,type:'Stock'}));
+  res.dropship=rows.filter(r=>r._rem>0).map(r=>({size:r.size,qty:r._rem}));
+  return res;
+}
+function parentTransfer(orderQty,childQty,parentInventory,poType,fifoLots){
+  if(poType!=='Stock') return {newChild:0,used:0,reason:'Invalid PO type → no transfer'};
+  const required=orderQty-childQty;
+  if(required<=0) return {newChild:childQty,used:0,reason:'Child already covers the order'};
+  if(parentInventory<=0) return {newChild:childQty,used:0,reason:'Parent has no inventory'};
+  if(!fifoLots||fifoLots.length===0) return {newChild:0,used:0,reason:'No FIFO lots returned'};
+  const take=Math.min(required,parentInventory); let remaining=take,used=0;
+  for(const lot of fifoLots){ const t=Math.min(lot,remaining); used+=t; remaining-=t; if(remaining<=0) break; }
+  return {newChild:childQty+used,used,reason:(used<required?'Partial transfer (remainder backordered)':'Parent covered the gap')};
+}
+function fmtRows(arr){ return arr.map(r=>r.size+":"+r.qty+(r.type?(" "+r.type):"")+(r.backorder?(" [backorder "+r.backorder+"]"):"")).join(", "); }
+function describeAlloc(res){
+  let s=(res.inPlaceFlip?"Line flips to DropShip in-place. ":"")+"Original line → "+fmtRows(res.original);
+  if(res.dropship.length) s+=" · New DropShip line → "+fmtRows(res.dropship);
+  else if(!res.inPlaceFlip) s+=" · no DropShip line";
+  if(res.transfers.length) s+=" · parent transfer "+res.transfers.map(t=>t.size+"+"+t.qty).join(",");
+  return s;
+}
+function describeTransfer(t){ return "New child qty = "+t.newChild+(t.used?(" (took "+t.used+" from parent)"):"")+", "+t.reason; }
+
+/* ===================== Scenarios ===================== */
+const GROUPS={ alloc:"Allocation", transfer:"Parent → Child transfer", warehouse:"Warehouse", store:"Store order" };
+const SCEN=[
+  // Allocation (computed)
+  {id:"SC-1",g:"alloc",title:"All sizes fully stocked",cond:["S 15/20","M 30/50","L 45/60","Backorder OFF","Transfer OFF"],alloc:{rows:[{size:"S",required:15,stock:20},{size:"M",required:30,stock:50},{size:"L",required:45,stock:60}],flags:{}}},
+  {id:"SC-2",g:"alloc",title:"Mixed, S partial, M zero, L partial",cond:["S 15/3","M 30/0","L 45/39","Backorder OFF"],alloc:{rows:[{size:"S",required:15,stock:3},{size:"M",required:30,stock:0},{size:"L",required:45,stock:39}],flags:{}}},
+  {id:"SC-3",g:"alloc",title:"S zero, M partial, L no inventory",cond:["S 15/0","M 30/14","L 45/0","Backorder OFF"],alloc:{rows:[{size:"S",required:15,stock:0},{size:"M",required:30,stock:14},{size:"L",required:45,stock:0}],flags:{}}},
+  {id:"SC-4",g:"alloc",title:"All sizes zero stock",cond:["S 10/0","M 20/0","Backorder OFF"],alloc:{rows:[{size:"S",required:10,stock:0},{size:"M",required:20,stock:0}],flags:{}}},
+  {id:"SC-5",g:"alloc",title:"Backorder mode, partial stock",cond:["S 15/6","M 30/0","Backorder ON"],alloc:{rows:[{size:"S",required:15,stock:6},{size:"M",required:30,stock:0}],flags:{backorder:true}}},
+  {id:"SC-6",g:"alloc",title:"Parent inventory transfer covers the gap",cond:["S 10/6","parent stock 10","Share Parent Inventory ON","same WH type"],alloc:{rows:[{size:"S",required:10,stock:6,parentStock:10}],flags:{parentTransfer:true,sameWhType:true}}},
+  {id:"SC-7",g:"warehouse",title:"No inventory record → Default warehouse fallback",cond:["No PartInventory record","Default warehouse set","Backorder ON","M 10/0"],alloc:{rows:[{size:"M",required:10,stock:0}],flags:{noRecord:true,defaultWarehouse:true,backorder:true}}},
+  {id:"SC-8",g:"warehouse",title:"No Default warehouse → in-place DropShip flip",cond:["No PartInventory record","No Default warehouse","Backorder OFF","M 10/0"],alloc:{rows:[{size:"M",required:10,stock:0}],flags:{noRecord:true,defaultWarehouse:false}}},
+  {id:"SC-9",g:"warehouse",title:"Warehouse priority, customer primary used",cond:["Customer primary WH-CUST stock 20","Global priority-1 WH-G1 stock 20","M 10 required"],manualExpected:"Allocated 10 from the customer primary warehouse WH-CUST; the global priority warehouses are never consulted."},
+  {id:"SC-10",g:"store",title:"Aether Store Order, system auto-alloc OFF, zero stock",cond:["orderType=StoreOrder","orderSource=aether","system auto-alloc OFF","Backorder ON","M 10/0"],manualExpected:"Aether Store Order takes the special zero-stock path even with system auto-alloc OFF → full qty backordered (M backorder 10). No DropShip line."},
+  {id:"SC-11",g:"store",title:"Aether Store Order, system auto-alloc ON",cond:["orderType=StoreOrder","orderSource=aether","system auto-alloc ON"],manualExpected:"Standard allocation path applies (same as a normal order with auto-allocation on)."},
+  // Parent → child transfer (computed)
+  {id:"T-1",g:"transfer",title:"Child has enough, no transfer needed",cond:["order 20","child 20","parent 40"],transfer:{order:20,child:20,parent:40,poType:"Stock",lots:[40]}},
+  {id:"T-2",g:"transfer",title:"Parent covers the shortfall exactly",cond:["order 40","child 10","parent 30"],transfer:{order:40,child:10,parent:30,poType:"Stock",lots:[30]}},
+  {id:"T-3",g:"transfer",title:"Parent has more than enough",cond:["order 40","child 10","parent 40"],transfer:{order:40,child:10,parent:40,poType:"Stock",lots:[40]}},
+  {id:"T-4",g:"transfer",title:"Parent has less than required (partial)",cond:["order 40","child 10","parent 15"],transfer:{order:40,child:10,parent:15,poType:"Stock",lots:[15]}},
+  {id:"T-5",g:"transfer",title:"Child zero, parent covers",cond:["order 40","child 0","parent 40"],transfer:{order:40,child:0,parent:40,poType:"Stock",lots:[40]}},
+  {id:"T-6",g:"transfer",title:"Parent has zero inventory",cond:["order 40","child 10","parent 0"],transfer:{order:40,child:10,parent:0,poType:"Stock",lots:[]}},
+  {id:"T-7",g:"transfer",title:"Multiple FIFO lots, parent covers",cond:["order 40","child 10","parent 50","lots 12/12/30"],transfer:{order:40,child:10,parent:50,poType:"Stock",lots:[12,12,30]}},
+  {id:"T-8",g:"transfer",title:"Multiple FIFO lots, parent partially covers",cond:["order 40","child 10","parent 20","lots 12/12"],transfer:{order:40,child:10,parent:20,poType:"Stock",lots:[12,12]}},
+  {id:"T-9",g:"transfer",title:"Invalid PO type (Dropship)",cond:["poType = Dropship"],transfer:{order:40,child:10,parent:40,poType:"Dropship",lots:[40]}},
+  {id:"T-10",g:"transfer",title:"No FIFO lots returned",cond:["parent 40 but FIFO returns empty"],transfer:{order:40,child:10,parent:40,poType:"Stock",lots:[]}},
+  {id:"T-11",g:"transfer",title:"Child cost present vs missing",cond:["cost logic"],manualExpected:"If the child cost is present it is used; if the child cost is missing (or both present) a weighted-average cost from the parent lots is applied."},
+  {id:"T-12",g:"transfer",title:"Different warehouse type, child has stock",cond:["parent customer-owned","child distributor-owned partial"],manualExpected:"Transfer blocked, parent and child warehouse types differ and the child is not at zero. Row follows DropShip / Backorder rules. (Same type, or child = 0, is required.)"},
+  {id:"T-13",g:"transfer",title:"Unreserve after a parent→child transfer",cond:["Booked with transfer","then unreserve the line"],manualExpected:"The child KEEPS the transferred inventory, it is not returned to the parent."}
+];
+
+function computeText(s){
+  if(s.alloc) return describeAlloc(allocate(s.alloc.rows.map(r=>({...r})), s.alloc.flags));
+  if(s.transfer){ const t=s.transfer; return describeTransfer(parentTransfer(t.order,t.child,t.parent,t.poType,t.lots)); }
+  return s.manualExpected||"";
+}
+function isComputed(s){ return !!(s.alloc||s.transfer); }
+
+/* ===================== State (localStorage) ===================== */
+const KEY="antera_aa_qa_v1";
+let store={};
+try{ store=JSON.parse(localStorage.getItem(KEY)||"{}"); }catch(e){ store={}; }
+function save(){ try{ localStorage.setItem(KEY,JSON.stringify(store)); }catch(e){} }
+function rec(id){ return store[id]||(store[id]={status:"untested",notes:""}); }
+
+/* ===================== Rendering ===================== */
+function expectedHtml(s){
+  const live = isComputed(s)?`<span class="live" title="Computed live from the allocation rules">computed</span>`:"";
+  return `<div class="exp"><span class="lab">Expected</span>${computeText(s)}${live}</div>`;
+}
+function scnCard(s){
+  const r=rec(s.id);
+  const chips=s.cond.map(c=>`<span class="chip">${c}</span>`).join("");
+  const btn=(v,t)=>`<button data-id="${s.id}" data-s="${v}" class="${r.status===v?'on':''}">${t}</button>`;
+  return `<div class="scn s-${r.status}" data-id="${s.id}">
+    <div class="top"><div><span class="tid">${s.id}</span> &nbsp;<span class="title">${s.title}</span></div><span class="badge">${GROUPS[s.g]}</span></div>
+    <div class="cond">${chips}</div>
+    ${expectedHtml(s)}
+    <div class="statusbtns">${btn("untested","Not tested")}${btn("pass","Pass")}${btn("fail","Fail")}${btn("blocked","Blocked")}</div>
+    <textarea data-id="${s.id}" placeholder="Actual result / notes (optional)">${(r.notes||"").replace(/</g,'&lt;')}</textarea>
+  </div>`;
+}
+function applyFilters(){
+  const q=document.getElementById("search").value.toLowerCase();
+  const fs=document.getElementById("fSection").value;
+  const fst=document.getElementById("fStatus").value;
+  return SCEN.filter(s=>{
+    const r=rec(s.id);
+    const hay=(s.id+" "+s.title+" "+s.cond.join(" ")+" "+computeText(s)).toLowerCase();
+    if(q && !hay.includes(q)) return false;
+    if(fs!=="all" && s.g!==fs) return false;
+    if(fst!=="all" && r.status!==fst) return false;
+    return true;
+  });
+}
+function renderList(){
+  const list=document.getElementById("list");
+  const rows=applyFilters();
+  if(!rows.length){ list.innerHTML=`<div class="empty">No tests match the current filters.</div>`; return; }
+  let html="",cur=null;
+  rows.forEach(s=>{
+    if(s.g!==cur){ cur=s.g; const n=rows.filter(x=>x.g===cur).length;
+      html+=`<div class="sec-head"><h3>${GROUPS[cur]}</h3><span class="sc">${n} test${n>1?'s':''}</span></div>`; }
+    html+=scnCard(s);
+  });
+  list.innerHTML=html;
+}
+function renderSummary(){
+  const c={untested:0,pass:0,fail:0,blocked:0};
+  SCEN.forEach(s=>c[rec(s.id).status]++);
+  const total=SCEN.length, executed=c.pass+c.fail+c.blocked;
+  document.getElementById("stTotal").textContent=total;
+  document.getElementById("stPass").textContent=c.pass;
+  document.getElementById("stFail").textContent=c.fail;
+  document.getElementById("stBlocked").textContent=c.blocked;
+  document.getElementById("stUntested").textContent=c.untested;
+  document.getElementById("stPct").textContent=Math.round(executed/total*100)+"%";
+  const pct=n=>(n/total*100).toFixed(2)+"%";
+  document.getElementById("progress").innerHTML=`<span class="p" style="width:${pct(c.pass)}"></span><span class="f" style="width:${pct(c.fail)}"></span><span class="b" style="width:${pct(c.blocked)}"></span>`;
+  const leg=document.getElementById("seclegend");
+  leg.innerHTML=Object.keys(GROUPS).map(k=>{
+    const inSec=SCEN.filter(s=>s.g===k); if(!inSec.length) return "";
+    const ex=inSec.filter(s=>rec(s.id).status!=="untested").length;
+    return `<span class="s" data-sec="${k}"><b>${GROUPS[k]}</b> ${ex}/${inSec.length}</span>`;
+  }).join("");
+  leg.querySelectorAll(".s").forEach(el=>el.addEventListener("click",()=>{ document.getElementById("fSection").value=el.dataset.sec; renderList(); }));
+}
+function refresh(){ renderSummary(); renderList(); }
+
+document.getElementById("list").addEventListener("click",e=>{
+  const b=e.target.closest("button[data-s]"); if(!b) return;
+  rec(b.dataset.id).status=b.dataset.s; save(); refresh();
+});
+document.getElementById("list").addEventListener("input",e=>{
+  const t=e.target.closest("textarea[data-id]"); if(!t) return;
+  rec(t.dataset.id).notes=t.value; save();
+});
+document.getElementById("search").addEventListener("input",renderList);
+document.getElementById("fSection").addEventListener("change",renderList);
+document.getElementById("fStatus").addEventListener("change",renderList);
+document.getElementById("printBtn").addEventListener("click",()=>window.print());
+document.getElementById("resetBtn").addEventListener("click",()=>{ if(confirm("Clear all statuses and notes for every test?")){ store={}; save(); refresh(); } });
+
+function ts(){ return new Date().toISOString().slice(0,19).replace(/[:T]/g,"-"); }
+function download(name,text,type){ const b=new Blob([text],{type}),u=URL.createObjectURL(b),a=document.createElement("a"); a.href=u;a.download=name;a.click();URL.revokeObjectURL(u); }
+function csvCell(v){ v=(v==null?"":String(v)); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }
+document.getElementById("expCsv").addEventListener("click",()=>{
+  const head=["ID","Group","Title","Conditions","Expected","Status","Notes"];
+  const rows=SCEN.map(s=>{const r=rec(s.id);return [s.id,GROUPS[s.g],s.title,s.cond.join(" · "),computeText(s),r.status,r.notes||""].map(csvCell).join(",");});
+  download("auto-allocation-qa-"+ts()+".csv",head.join(",")+"\n"+rows.join("\n"),"text/csv");
+});
+document.getElementById("expJson").addEventListener("click",()=>{
+  const out={exportedAt:new Date().toISOString(),results:{}};
+  SCEN.forEach(s=>{const r=rec(s.id);out.results[s.id]={status:r.status,notes:r.notes||"",expected:computeText(s)};});
+  download("auto-allocation-qa-"+ts()+".json",JSON.stringify(out,null,2),"application/json");
+});
+document.getElementById("impBtn").addEventListener("click",()=>document.getElementById("impFile").click());
+document.getElementById("impFile").addEventListener("change",e=>{
+  const f=e.target.files[0]; if(!f) return; const reader=new FileReader();
+  reader.onload=()=>{ try{ const data=JSON.parse(reader.result); const res=data.results||data;
+    Object.keys(res).forEach(id=>{ if(res[id]) store[id]={status:res[id].status||"untested",notes:res[id].notes||""}; });
+    save(); refresh(); alert("Imported results."); }catch(err){ alert("Could not read that file, expected a JSON export from this page."); } e.target.value=""; };
+  reader.readAsText(f);
+});
+
+(function init(){
+  const sel=document.getElementById("fSection");
+  Object.keys(GROUPS).forEach(k=>{ if(SCEN.some(s=>s.g===k)){ const o=document.createElement("option"); o.value=k; o.textContent=GROUPS[k]; sel.appendChild(o); } });
+  refresh();
+})();
+</script>
+</body>
+</html>
