@@ -1,18 +1,19 @@
 # Decap CMS configuration.
 #
-# LOCAL EDITING (no login, for trying it out):
-#   1) cd angular-app && npx decap-server      (leave running)
-#   2) in another terminal: npm start
-#   3) open http://localhost:4200/admin/
-#   With local_backend on, saves write straight to the JSON files in src/content/.
+# LOGIN (live site): editors open /admin/ and click "Login with GitHub". That goes
+# through the OAuth proxy set in `base_url` below (see cms-oauth/SETUP.md to deploy it).
+# The GitHub account used must have write access to this repo.
 #
-# PRODUCTION (real non-dev editors): set the github backend below to your repo and
-# remove (or keep) local_backend. Editors then log in and saves are committed to git.
+# LOCAL EDITING (no login): run `npx decap-server` then `npm start`, open /admin/.
+# `local_backend` makes Decap use the local files when on localhost.
 
 backend:
   name: github
-  repo: your-org/antera-docs   # TODO: change to your GitHub owner/repo
+  repo: dpartida-antera/documentation
   branch: main
+  # TODO: replace with your deployed OAuth proxy URL (no trailing slash).
+  base_url: https://antera-cms-auth.dpartida.workers.dev
+  auth_endpoint: auth
 
 local_backend: true
 
