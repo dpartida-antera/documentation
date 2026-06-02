@@ -11,12 +11,36 @@
   <script src="https://unpkg.com/decap-cms@^3.3.3/dist/decap-cms.js"></script>
   <script>
     // Preview template shared by both guides (shipping and auto-allocation).
-    // Renders the hero title/lead and each section, with colour-coded callouts:
+    // Renders all content including cards, tables, screenshots, and custom sections.
+    //
+    // Colour-coded callouts:
     //   info  → blue   (highlighted tip)
     //   note  → yellow (warning / edge-case)
     //   body  → green  (closing paragraph)
-    //   lead  → plain text
     var CALLOUT_BG = { info: '#dbeafe', note: '#fef9c3', body: '#dcfce7' };
+
+    var S = {
+      label:     { fontSize: '0.68rem', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.07em', color: '#9ca3af', marginBottom: '4px' },
+      divider:   { borderBottom: '1px solid #e5e7eb', paddingBottom: '20px', marginBottom: '24px' },
+      section:   { marginBottom: '28px' },
+      heading:   { margin: '0 0 6px', fontSize: '1.05rem', fontWeight: '700', color: '#111827' },
+      subheading:{ margin: '14px 0 4px', fontSize: '0.95rem', fontWeight: '600', color: '#374151' },
+      subtitle:  { margin: '0 0 10px', color: '#6b7280', fontSize: '13px' },
+      lead:      { margin: '6px 0' },
+      card:      { border: '1px solid #e5e7eb', borderRadius: '8px', padding: '12px', background: '#f9fafb' },
+      tag:       { display: 'inline-block', fontSize: '11px', fontWeight: '600', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '4px' },
+      cardTitle: { fontWeight: '600', margin: '2px 0 6px', color: '#111827' },
+      cardGrid:  { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(190px, 1fr))', gap: '10px', margin: '8px 0 12px' },
+      table:     { width: '100%', borderCollapse: 'collapse', margin: '8px 0 12px', fontSize: '13px' },
+      th:        { textAlign: 'left', padding: '6px 8px', borderBottom: '2px solid #e5e7eb', fontWeight: '600', color: '#374151', background: '#f9fafb' },
+      td:        { padding: '6px 8px', verticalAlign: 'top', borderBottom: '1px solid #f3f4f6' },
+      shotGrid:  { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '10px', margin: '8px 0' },
+      shot:      { border: '1px solid #e5e7eb', borderRadius: '8px', padding: '10px', fontSize: '12.5px', color: '#6b7280', background: '#fafbfd' },
+      shotTitle: { display: 'block', fontWeight: '600', color: '#111827', marginBottom: '2px' },
+      pill:      { display: 'inline-block', marginTop: '8px', fontSize: '12px', color: '#6b7280', background: '#f3f4f6', padding: '2px 10px', borderRadius: '12px' },
+      footer:    { marginTop: '32px', paddingTop: '16px', borderTop: '1px solid #e5e7eb', fontSize: '12px', color: '#9ca3af' },
+      customBorder: { borderTop: '2px dashed #e5e7eb', paddingTop: '16px', marginTop: '8px' },
+    };
 
     var GuidePreview = createClass({
       md: function (text) {
@@ -24,65 +48,136 @@
         return h('div', { dangerouslySetInnerHTML: { __html: marked.parse(String(text)) } });
       },
 
+      renderCards: function (cards) {
+        if (!Array.isArray(cards) || !cards.length) return null;
+        var self = this;
+        return h('div', { style: S.cardGrid },
+          cards.map(function (card, i) {
+            return h('div', { key: i, style: S.card },
+              card.tag   ? h('span', { style: S.tag },       card.tag)   : null,
+              card.title ? h('div',  { style: S.cardTitle }, card.title) : null,
+              card.body  ? self.md(card.body)                            : null
+            );
+          })
+        );
+      },
+
+      renderTable: function (rows) {
+        if (!Array.isArray(rows) || !rows.length) return null;
+        var self = this;
+        var cols = Object.keys(rows[0]);
+        return h('table', { style: S.table },
+          h('thead', {},
+            h('tr', {},
+              cols.map(function (col) {
+                return h('th', { key: col, style: S.th }, col.replace(/_/g, ' '));
+              })
+            )
+          ),
+          h('tbody', {},
+            rows.map(function (row, i) {
+              return h('tr', { key: i },
+                cols.map(function (col) {
+                  var val = row[col];
+                  return h('td', { key: col, style: S.td },
+                    typeof val === 'string' ? self.md(val) : String(val != null ? val : '')
+                  );
+                })
+              );
+            })
+          )
+        );
+      },
+
+      renderShots: function (shots) {
+        if (!Array.isArray(shots) || !shots.length) return null;
+        return h('div', { style: S.shotGrid },
+          shots.map(function (shot, i) {
+            return h('div', { key: i, style: S.shot },
+              h('b', { style: S.shotTitle }, shot.title || ''),
+              shot.location || ''
+            );
+          })
+        );
+      },
+
       renderField: function (key, value) {
-        if (!value) return null;
-        // Skip arrays (cards, table rows, shots) and non-string values — rendered separately
+        if (value === null || value === undefined || value === '') return null;
+
+        if (Array.isArray(value)) {
+          if (key === 'cards')  return this.renderCards(value);
+          if (key === 'table')  return this.renderTable(value);
+          if (key === 'rows')   return this.renderTable(value);
+          if (key === 'shots')  return this.renderShots(value);
+          return null;
+        }
+
         if (typeof value !== 'string') return null;
-        var isLead = key === 'lead' || key === 'heading';
+
+        if (key === 'heading')           return h('h3',  { key: key, style: S.heading },   value);
+        if (key === 'locations_heading') return h('h4',  { key: key, style: S.subheading }, value);
+        if (key === 'locations_subtitle')return h('p',   { key: key, style: S.subtitle },   value);
+
+        var isLead = key === 'lead';
         var style = isLead
-          ? { margin: '6px 0' }
-          : {
-              background: CALLOUT_BG[key] || '#f3f4f6',
-              padding: '10px 14px',
-              borderRadius: '6px',
-              margin: '8px 0',
-            };
-        return h('div', { key: key, style: style }, key === 'heading'
-          ? h('strong', {}, value)
-          : this.md(value));
+          ? S.lead
+          : { background: CALLOUT_BG[key] || '#f3f4f6', padding: '10px 14px', borderRadius: '6px', margin: '8px 0' };
+        return h('div', { key: key, style: style }, this.md(value));
+      },
+
+      renderSection: function (secKey, sec) {
+        var self = this;
+        var fields = Object.keys(sec).map(function (fieldKey) {
+          return self.renderField(fieldKey, sec[fieldKey]);
+        });
+        return h('div', { key: secKey, style: S.section },
+          h('div', { style: S.label }, secKey),
+          fields
+        );
       },
 
       render: function () {
         var self = this;
-        // Convert Immutable record to plain JS once; all nested access is then normal JS.
         var raw = this.props.entry.get('data');
         if (!raw) return h('div', {}, 'Loading…');
         var data = raw.toJS ? raw.toJS() : raw;
 
-        var hero = data.hero || {};
-        var sections = data.sections || {};
+        var hero         = data.hero || {};
+        var sections     = data.sections || {};
+        var extraSections = Array.isArray(data.extra_sections) ? data.extra_sections : [];
+        var footer       = data.footer || '';
 
         var sectionEls = Object.keys(sections).map(function (secKey) {
-          var sec = sections[secKey] || {};
-          var fields = Object.keys(sec).map(function (fieldKey) {
-            return self.renderField(fieldKey, sec[fieldKey]);
-          });
-          return h('div', { key: secKey, style: { marginBottom: '24px' } },
-            h('h2', {
-              style: {
-                fontSize: '0.75rem', fontWeight: '700', textTransform: 'uppercase',
-                letterSpacing: '0.07em', color: '#6b7280',
-                borderBottom: '1px solid #e5e7eb', paddingBottom: '4px', marginBottom: '8px',
-              }
-            }, secKey),
-            fields
+          return self.renderSection(secKey, sections[secKey] || {});
+        });
+
+        var extraEls = extraSections.map(function (sec, i) {
+          return h('div', { key: 'extra-' + i, style: Object.assign({}, S.section, S.customBorder) },
+            h('div', { style: Object.assign({}, S.label, { color: '#a78bfa' }) }, 'Custom section'),
+            Object.keys(sec).map(function (fieldKey) {
+              return self.renderField(fieldKey, sec[fieldKey]);
+            })
           );
         });
 
         return h('div', {
-          style: {
-            fontFamily: 'system-ui, -apple-system, sans-serif',
-            maxWidth: '700px', margin: '0 auto', padding: '24px',
-            lineHeight: '1.65', color: '#111827',
-          }
+          style: { fontFamily: 'system-ui, -apple-system, sans-serif', maxWidth: '720px', margin: '0 auto', padding: '24px', lineHeight: '1.65', color: '#111827' }
         },
           hero.title
-            ? h('div', { style: { marginBottom: '32px', paddingBottom: '20px', borderBottom: '2px solid #e5e7eb' } },
+            ? h('div', { style: S.divider },
                 h('h1', { style: { margin: '0 0 10px', fontSize: '1.5rem', fontWeight: '700' } }, hero.title),
-                this.md(hero.lead)
+                this.md(hero.lead),
+                hero.pill ? h('span', { style: S.pill }, hero.pill) : null
               )
             : null,
-          sectionEls
+          sectionEls,
+          extraEls.length
+            ? h('div', {},
+                h('div', { style: Object.assign({}, S.label, { marginBottom: '12px' }) }, 'Custom sections'),
+                extraEls
+              )
+            : null,
+          footer ? h('div', { style: S.footer }, footer) : null
         );
       },
     });
