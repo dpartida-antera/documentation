@@ -10,8 +10,8 @@
     "deploy": "npm run build && wrangler deploy",
     "preview": "npm run build && wrangler dev",
     "deploy:oauth": "npx wrangler deploy -c cms-oauth/wrangler.jsonc",
-    "secret:oauth:id": "npx wrangler versions secret put GITHUB_CLIENT_ID -c cms-oauth/wrangler.jsonc",
-    "secret:oauth:secret": "npx wrangler versions secret put GITHUB_CLIENT_SECRET -c cms-oauth/wrangler.jsonc"
+    "secret:oauth:id": "npx wrangler secret put GITHUB_CLIENT_ID -c cms-oauth/wrangler.jsonc",
+    "secret:oauth:secret": "npx wrangler secret put GITHUB_CLIENT_SECRET -c cms-oauth/wrangler.jsonc"
   },
   "private": true,
   "dependencies": {

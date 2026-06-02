@@ -26,6 +26,8 @@ Easiest, dashboard route:
 
 (CLI alternative from repo root: `npm run deploy:oauth`, then `npm run secret:oauth:id` and `npm run secret:oauth:secret`.)
 
+If Wrangler returns a version-related secret error, redeploy first (`npm run deploy:oauth`) and retry the secret command. If it still fails, set the two secrets in the Cloudflare dashboard (Worker -> Settings -> Variables and Secrets) and deploy once.
+
 ## 3. Point the CMS at the worker
 
 In `public/admin/config.yml`, set:
