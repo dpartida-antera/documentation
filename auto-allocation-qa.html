@@ -24,6 +24,24 @@
   .qa-toolbar .btn{padding:9px 13px;border:1px solid var(--line);border-radius:9px;background:var(--card);font-size:13px;font-weight:600;color:var(--navy-2);cursor:pointer}
   .qa-toolbar .btn:hover{border-color:var(--blue);color:var(--blue)}
   .qa-toolbar .btn.danger:hover{border-color:#c83838;color:#c83838}
+  .qa-toolbar input#tester{flex:0 0 auto;min-width:140px;max-width:190px}
+  .histcount{font-size:12px;color:var(--muted);align-self:center}
+  .historypanel{margin:0 0 18px}
+  .hist-empty{color:var(--muted);font-size:13px;padding:4px 0 10px}
+  .histtitle{font-size:11px;font-weight:700;color:var(--navy);margin:0 0 8px;text-transform:uppercase;letter-spacing:.5px}
+  .histrow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;border:1px solid var(--line);border-radius:10px;padding:10px 13px;margin-bottom:8px;background:var(--card)}
+  .histrow .when{font-weight:700;color:var(--navy);font-size:13.5px}
+  .histrow .who{color:var(--muted);font-size:12px}
+  .histrow .tally{display:flex;gap:6px;margin-left:auto;font-size:12px}
+  .histrow .tally .t{border-radius:5px;padding:1px 7px;font-weight:700}
+  .histrow .tally .t.pass{background:#e6f6ee;color:#0a8a4f}
+  .histrow .tally .t.fail{background:#fdecec;color:#c83838}
+  .histrow .tally .t.blk{background:#fdf6e3;color:#a9760a}
+  .histrow .tally .t.unt{background:#eef1f5;color:#5a6675}
+  .histrow .acts{display:flex;gap:6px}
+  .histrow .acts button{border:1px solid var(--line);background:var(--card);border-radius:7px;padding:5px 9px;font-size:12px;font-weight:600;color:var(--navy-2);cursor:pointer}
+  .histrow .acts button:hover{border-color:var(--blue);color:var(--blue)}
+  .histrow .acts button.del:hover{border-color:#c83838;color:#c83838}
   .sec-head{margin:26px 0 10px;display:flex;align-items:baseline;gap:10px}
   .sec-head h3{margin:0;font-size:16px;color:var(--navy)}
   .sec-head .sc{font-size:12px;color:var(--muted)}
@@ -47,7 +65,7 @@
   .scn textarea:focus{outline:none;border-color:var(--blue)}
   .empty{color:var(--muted);text-align:center;padding:40px;font-size:14px}
   @media(max-width:760px){.qa-summary{grid-template-columns:repeat(3,1fr)}}
-  @media print{.topbar,.qa-toolbar,.statusbtns,.docnav,.backlink{display:none!important}.scn{break-inside:avoid;border:1px solid #ccc}.doc-layout{display:block}}
+  @media print{.topbar,.qa-toolbar,.statusbtns,.docnav,.backlink,.historypanel{display:none!important}.scn{break-inside:avoid;border:1px solid #ccc}.doc-layout{display:block}}
 </style>
 </head>
 <body>
@@ -107,6 +125,9 @@
             <option value="fail">Fail</option>
             <option value="blocked">Blocked</option>
           </select>
+          <input type="text" id="tester" placeholder="Your name / initials">
+          <button class="btn" id="saveRun">＋ Save this run</button>
+          <span class="histcount" id="histCount"></span>
           <button class="btn" id="expCsv">Export CSV</button>
           <button class="btn" id="expJson">Export JSON</button>
           <button class="btn" id="impBtn">Import JSON</button>
@@ -114,6 +135,7 @@
           <button class="btn danger" id="resetBtn">Reset all</button>
           <input type="file" id="impFile" accept="application/json" style="display:none">
         </div>
+        <div id="history" class="historypanel"></div>
         <div id="list"></div>
       </section>
 
@@ -207,6 +229,12 @@ try{ store=JSON.parse(localStorage.getItem(KEY)||"{}"); }catch(e){ store={}; }
 function save(){ try{ localStorage.setItem(KEY,JSON.stringify(store)); }catch(e){} }
 function rec(id){ return store[id]||(store[id]={status:"untested",notes:""}); }
 
+/* run history (local snapshots) */
+const HKEY="antera_aa_qa_history_v1", TKEY="antera_aa_qa_tester";
+let history=[]; try{ history=JSON.parse(localStorage.getItem(HKEY)||"[]"); }catch(e){ history=[]; }
+function saveHist(){ try{ localStorage.setItem(HKEY, JSON.stringify(history)); }catch(e){} }
+function escapeHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
 /* ===================== Rendering ===================== */
 function expectedHtml(s){
   const live = isComputed(s)?`<span class="live" title="Computed live from the allocation rules">computed</span>`:"";
@@ -288,15 +316,50 @@ document.getElementById("resetBtn").addEventListener("click",()=>{ if(confirm("C
 function ts(){ return new Date().toISOString().slice(0,19).replace(/[:T]/g,"-"); }
 function download(name,text,type){ const b=new Blob([text],{type}),u=URL.createObjectURL(b),a=document.createElement("a"); a.href=u;a.download=name;a.click();URL.revokeObjectURL(u); }
 function csvCell(v){ v=(v==null?"":String(v)); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }
-document.getElementById("expCsv").addEventListener("click",()=>{
+function tsFromIso(iso){ return iso.slice(0,19).replace(/[:T]/g,"-"); }
+function buildCsvFrom(results){
   const head=["ID","Group","Title","Conditions","Expected","Status","Notes"];
-  const rows=SCEN.map(s=>{const r=rec(s.id);return [s.id,GROUPS[s.g],s.title,s.cond.join(" · "),computeText(s),r.status,r.notes||""].map(csvCell).join(",");});
-  download("auto-allocation-qa-"+ts()+".csv",head.join(",")+"\n"+rows.join("\n"),"text/csv");
-});
-document.getElementById("expJson").addEventListener("click",()=>{
-  const out={exportedAt:new Date().toISOString(),results:{}};
-  SCEN.forEach(s=>{const r=rec(s.id);out.results[s.id]={status:r.status,notes:r.notes||"",expected:computeText(s)};});
-  download("auto-allocation-qa-"+ts()+".json",JSON.stringify(out,null,2),"application/json");
+  const rows=SCEN.map(s=>{const r=results[s.id]||{status:"untested",notes:""};return [s.id,GROUPS[s.g],s.title,s.cond.join(" · "),computeText(s),r.status,r.notes||""].map(csvCell).join(",");});
+  return head.join(",")+"\n"+rows.join("\n");
+}
+function buildJsonFrom(results,meta){
+  const out=Object.assign({exportedAt:new Date().toISOString()}, meta||{}, {results:{}});
+  SCEN.forEach(s=>{const r=results[s.id]||{status:"untested",notes:""};out.results[s.id]={status:r.status||"untested",notes:r.notes||"",expected:computeText(s)};});
+  return out;
+}
+document.getElementById("expCsv").addEventListener("click",()=>download("auto-allocation-qa-"+ts()+".csv",buildCsvFrom(store),"text/csv"));
+document.getElementById("expJson").addEventListener("click",()=>download("auto-allocation-qa-"+ts()+".json",JSON.stringify(buildJsonFrom(store),null,2),"application/json"));
+
+/* ---- Run history (local snapshots) ---- */
+function tally(results){ const c={untested:0,pass:0,fail:0,blocked:0}; SCEN.forEach(s=>{ const st=(results[s.id]&&results[s.id].status)||"untested"; c[st]++; }); return c; }
+function saveRun(){
+  const tester=(document.getElementById("tester").value||"").trim();
+  history.unshift({ id:Date.now().toString(36)+Math.random().toString(36).slice(2,6), savedAt:new Date().toISOString(), tester:tester, results:JSON.parse(JSON.stringify(store)) });
+  saveHist(); renderHistory();
+}
+function renderHistory(){
+  const host=document.getElementById("history");
+  document.getElementById("histCount").textContent = history.length? (history.length+" saved"):"";
+  if(!history.length){ host.innerHTML=`<div class="hist-empty">No saved runs yet. Enter your name and click “Save this run” to snapshot the current results.</div>`; return; }
+  host.innerHTML=`<div class="histtitle">Saved runs</div>`+history.map(h=>{
+    const c=tally(h.results);
+    return `<div class="histrow" data-id="${h.id}">
+      <div><div class="when">${new Date(h.savedAt).toLocaleString()}</div><div class="who">${h.tester?("by "+escapeHtml(h.tester)):"no name"}</div></div>
+      <div class="tally"><span class="t pass">${c.pass} pass</span><span class="t fail">${c.fail} fail</span><span class="t blk">${c.blocked} blk</span><span class="t unt">${c.untested} left</span></div>
+      <div class="acts"><button data-act="load">Open</button><button data-act="csv">CSV</button><button data-act="json">JSON</button><button class="del" data-act="del">Delete</button></div>
+    </div>`;
+  }).join("");
+}
+document.getElementById("saveRun").addEventListener("click",saveRun);
+document.getElementById("tester").addEventListener("input",e=>{ try{ localStorage.setItem(TKEY,e.target.value); }catch(_){} });
+document.getElementById("history").addEventListener("click",e=>{
+  const btn=e.target.closest("button[data-act]"); if(!btn) return;
+  const id=e.target.closest(".histrow").dataset.id, h=history.find(x=>x.id===id); if(!h) return;
+  const act=btn.dataset.act;
+  if(act==="load"){ if(confirm("Open this saved run? It replaces the current working results (save the current run first if you need it).")){ store=JSON.parse(JSON.stringify(h.results)); save(); refresh(); window.scrollTo({top:0,behavior:"smooth"}); } }
+  else if(act==="csv"){ download("auto-allocation-qa-"+tsFromIso(h.savedAt)+".csv",buildCsvFrom(h.results),"text/csv"); }
+  else if(act==="json"){ download("auto-allocation-qa-"+tsFromIso(h.savedAt)+".json",JSON.stringify(buildJsonFrom(h.results,{savedAt:h.savedAt,tester:h.tester}),null,2),"application/json"); }
+  else if(act==="del"){ if(confirm("Delete this saved run?")){ history=history.filter(x=>x.id!==id); saveHist(); renderHistory(); } }
 });
 document.getElementById("impBtn").addEventListener("click",()=>document.getElementById("impFile").click());
 document.getElementById("impFile").addEventListener("change",e=>{
@@ -310,7 +373,8 @@ document.getElementById("impFile").addEventListener("change",e=>{
 (function init(){
   const sel=document.getElementById("fSection");
   Object.keys(GROUPS).forEach(k=>{ if(SCEN.some(s=>s.g===k)){ const o=document.createElement("option"); o.value=k; o.textContent=GROUPS[k]; sel.appendChild(o); } });
-  refresh();
+  try{ const t=localStorage.getItem(TKEY); if(t) document.getElementById("tester").value=t; }catch(_){}
+  refresh(); renderHistory();
 })();
 </script>
 </body>
