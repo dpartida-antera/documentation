@@ -16,6 +16,10 @@ type ExtraSection = {
   info?: string;
   note?: string;
   body?: string;
+  cards?: Array<{ tag: string; title: string; body: string }>;
+  table_header_col1?: string;
+  table_header_col2?: string;
+  table?: Array<{ col1: string; col2: string }>;
 };
 
 const content = rawContent as typeof rawContent & { extra_sections: ExtraSection[] };
@@ -159,6 +163,33 @@ const content = rawContent as typeof rawContent & { extra_sections: ExtraSection
           <h2>{{ s.heading }}</h2>
           @if (s.lead) { <p class="lead" [innerHTML]="md(s.lead)"></p> }
           @if (s.info) { <div class="info" [innerHTML]="md(s.info)"></div> }
+          @if (s.cards?.length) {
+            <div class="grid g3" style="margin-bottom:1rem">
+              @for (card of s.cards!; track card.tag) {
+                <div class="card doc-card">
+                  <span class="tag">{{ card.tag }}</span>
+                  <h4>{{ card.title }}</h4>
+                  <p [innerHTML]="md(card.body)"></p>
+                </div>
+              }
+            </div>
+          }
+          @if (s.table?.length) {
+            <table>
+              <thead><tr>
+                <th>{{ s.table_header_col1 || 'Item' }}</th>
+                <th>{{ s.table_header_col2 || 'Details' }}</th>
+              </tr></thead>
+              <tbody>
+                @for (row of s.table!; track row.col1) {
+                  <tr>
+                    <td><b>{{ row.col1 }}</b></td>
+                    <td [innerHTML]="md(row.col2)"></td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
           @if (s.note) { <div class="note" [innerHTML]="md(s.note)"></div> }
           @if (s.body) { <p [innerHTML]="md(s.body)"></p> }
         </section>

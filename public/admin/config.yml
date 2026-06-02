@@ -148,6 +148,27 @@ collections:
               - { name: info, label: Info callout (blue), widget: markdown, required: false }
               - { name: note, label: Note callout (yellow), widget: markdown, required: false }
               - { name: body, label: Body paragraph, widget: markdown, required: false }
+              - name: cards
+                label: Cards (optional)
+                widget: list
+                required: false
+                label_singular: Card
+                summary: "{{fields.tag}} – {{fields.title}}"
+                fields:
+                  - { name: tag, label: Tag label, widget: string }
+                  - { name: title, label: Card title, widget: string }
+                  - { name: body, label: Card body, widget: markdown }
+              - { name: table_header_col1, label: "Table: column 1 header", widget: string, required: false }
+              - { name: table_header_col2, label: "Table: column 2 header", widget: string, required: false }
+              - name: table
+                label: Table rows (optional)
+                widget: list
+                required: false
+                label_singular: Row
+                summary: "{{fields.col1}}"
+                fields:
+                  - { name: col1, label: Column 1, widget: string }
+                  - { name: col2, label: Column 2, widget: markdown }
 
           - { name: footer, label: Footer text, widget: string }
 
@@ -297,5 +318,26 @@ collections:
               - { name: info, label: Info callout (blue), widget: markdown, required: false }
               - { name: note, label: Note callout (yellow), widget: markdown, required: false }
               - { name: body, label: Body paragraph, widget: markdown, required: false }
+              - name: cards
+                label: Cards (optional)
+                widget: list
+                required: false
+                label_singular: Card
+                summary: "{{fields.tag}} – {{fields.title}}"
+                fields:
+                  - { name: tag, label: Tag label, widget: string }
+                  - { name: title, label: Card title, widget: string }
+                  - { name: body, label: Card body, widget: markdown }
+              - { name: table_header_col1, label: "Table: column 1 header", widget: string, required: false }
+              - { name: table_header_col2, label: "Table: column 2 header", widget: string, required: false }
+              - name: table
+                label: Table rows (optional)
+                widget: list
+                required: false
+                label_singular: Row
+                summary: "{{fields.col1}}"
+                fields:
+                  - { name: col1, label: Column 1, widget: string }
+                  - { name: col2, label: Column 2, widget: markdown }
 
           - { name: footer, label: Footer text, widget: string }
