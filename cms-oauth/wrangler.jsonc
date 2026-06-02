@@ -3,6 +3,9 @@
   "name": "antera-cms-auth",
   "main": "worker.js",
   "compatibility_date": "2026-06-02",
+  "vars": {
+    "GITHUB_CLIENT_ID": "Ov23lioID6B40u9TeKdw"
+  },
   "observability": {
     "enabled": true
   }
