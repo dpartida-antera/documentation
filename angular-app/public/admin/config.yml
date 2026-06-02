@@ -23,6 +23,7 @@ public_folder: "/assets/uploads"
 collections:
   - name: guides
     label: Guides
+    format: json
     editor:
       preview: false
     files:
