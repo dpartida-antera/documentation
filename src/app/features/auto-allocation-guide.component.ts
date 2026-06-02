@@ -44,21 +44,21 @@ const content = rawContent as typeof rawContent & { extra_sections: ExtraSection
       <div class="docsub">QA &amp; Support reference</div>
       <nav>
         <a class="section">Understand</a>
-        <a href="#start">{{ c.sections.start.heading }}</a>
-        <a href="#prereq">{{ c.sections.prereq.heading }}</a>
-        <a href="#flags">{{ c.sections.flags.heading }}</a>
-        <a href="#outcomes">{{ c.sections.outcomes.heading }}</a>
-        <a href="#warehouse">{{ c.sections.warehouse.heading }}</a>
-        <a href="#parent">{{ c.sections.parent.heading }}</a>
+        <a [routerLink]="[]" fragment="start">{{ c.sections.start.heading }}</a>
+        <a [routerLink]="[]" fragment="prereq">{{ c.sections.prereq.heading }}</a>
+        <a [routerLink]="[]" fragment="flags">{{ c.sections.flags.heading }}</a>
+        <a [routerLink]="[]" fragment="outcomes">{{ c.sections.outcomes.heading }}</a>
+        <a [routerLink]="[]" fragment="warehouse">{{ c.sections.warehouse.heading }}</a>
+        <a [routerLink]="[]" fragment="parent">{{ c.sections.parent.heading }}</a>
         <a class="section">Use</a>
-        <a href="#tool">{{ c.sections.tool.heading }}</a>
-        <a href="#flows">{{ c.sections.flows.heading }}</a>
-        <a href="#scenarios">Scenario library</a>
+        <a [routerLink]="[]" fragment="tool">{{ c.sections.tool.heading }}</a>
+        <a [routerLink]="[]" fragment="flows">{{ c.sections.flows.heading }}</a>
+        <a [routerLink]="[]" fragment="scenarios">Scenario library</a>
         <a routerLink="/auto-allocation/qa">QA test runner</a>
         @if (extraSections.length) {
           <a class="section">More</a>
           @for (s of extraSections; track s.id) {
-            <a [href]="'#' + s.id">{{ s.heading }}</a>
+            <a [routerLink]="[]" [fragment]="s.id">{{ s.heading }}</a>
           }
         }
       </nav>

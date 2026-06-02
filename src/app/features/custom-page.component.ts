@@ -40,7 +40,7 @@ const pages = rawPages as { pages: CustomPage[] };
         <div class="docsub">QA &amp; Support reference</div>
         <nav>
           @for (s of page.sections; track s.id) {
-            <a [href]="'#' + s.id">{{ s.heading }}</a>
+            <a [routerLink]="[]" [fragment]="s.id">{{ s.heading }}</a>
           }
         </nav>
       </aside>

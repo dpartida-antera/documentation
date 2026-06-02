@@ -36,21 +36,21 @@ const content = rawContent as typeof rawContent & { extra_sections: ExtraSection
       <div class="docsub">QA &amp; Support reference</div>
       <nav>
         <a class="section">Understand</a>
-        <a href="#start">{{ c.sections.start.heading }}</a>
-        <a href="#docs">{{ c.sections.docs.heading }}</a>
-        <a href="#flags">{{ c.sections.flags.heading }}</a>
-        <a href="#priority">{{ c.sections.priority.heading }}</a>
+        <a [routerLink]="[]" fragment="start">{{ c.sections.start.heading }}</a>
+        <a [routerLink]="[]" fragment="docs">{{ c.sections.docs.heading }}</a>
+        <a [routerLink]="[]" fragment="flags">{{ c.sections.flags.heading }}</a>
+        <a [routerLink]="[]" fragment="priority">{{ c.sections.priority.heading }}</a>
         <a class="section">Use</a>
-        <a href="#tool">{{ c.sections.tool.heading }}</a>
-        <a href="#flows">{{ c.sections.flows.heading }}</a>
-        <a href="#scenarios">{{ c.sections.scenarios.heading }}</a>
+        <a [routerLink]="[]" fragment="tool">{{ c.sections.tool.heading }}</a>
+        <a [routerLink]="[]" fragment="flows">{{ c.sections.flows.heading }}</a>
+        <a [routerLink]="[]" fragment="scenarios">{{ c.sections.scenarios.heading }}</a>
         <a class="section">Reference</a>
-        <a href="#glossary">{{ c.sections.glossary.heading }}</a>
+        <a [routerLink]="[]" fragment="glossary">{{ c.sections.glossary.heading }}</a>
         <a routerLink="/shipping/qa">QA test runner</a>
         @if (extraSections.length) {
           <a class="section">More</a>
           @for (s of extraSections; track s.id) {
-            <a [href]="'#' + s.id">{{ s.heading }}</a>
+            <a [routerLink]="[]" [fragment]="s.id">{{ s.heading }}</a>
           }
         }
       </nav>
