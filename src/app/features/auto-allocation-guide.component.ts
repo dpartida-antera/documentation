@@ -7,7 +7,18 @@ import { ALLOCATION_FLOWS } from '../core/flow-specs';
 import { ALLOCATION_QA_SCENARIOS } from './allocation-scenarios';
 import { QaScenario } from '../shared/qa-runner.component';
 import { mdInline } from '../core/markdown';
-import content from '../../content/auto-allocation-guide.json';
+import rawContent from '../../content/auto-allocation-guide.json';
+
+type ExtraSection = {
+  id: string;
+  heading: string;
+  lead?: string;
+  info?: string;
+  note?: string;
+  body?: string;
+};
+
+const content = rawContent as typeof rawContent & { extra_sections: ExtraSection[] };
 
 @Component({
   selector: 'app-auto-allocation-guide',
@@ -25,21 +36,27 @@ import content from '../../content/auto-allocation-guide.json';
   <div class="doc-layout">
     <aside class="docnav">
       <a class="backlink" routerLink="/">All guides</a>
-      <div class="doctitle">Auto Allocation Guide</div>
+      <div class="doctitle">{{ c.hero.title }}</div>
       <div class="docsub">QA &amp; Support reference</div>
       <nav>
         <a class="section">Understand</a>
-        <a href="#start">How it works</a>
-        <a href="#prereq">Prerequisites</a>
-        <a href="#flags">Settings &amp; flags</a>
-        <a href="#outcomes">Allocation outcomes</a>
-        <a href="#warehouse">Warehouse priority</a>
-        <a href="#parent">Parent to Child transfer</a>
+        <a href="#start">{{ c.sections.start.heading }}</a>
+        <a href="#prereq">{{ c.sections.prereq.heading }}</a>
+        <a href="#flags">{{ c.sections.flags.heading }}</a>
+        <a href="#outcomes">{{ c.sections.outcomes.heading }}</a>
+        <a href="#warehouse">{{ c.sections.warehouse.heading }}</a>
+        <a href="#parent">{{ c.sections.parent.heading }}</a>
         <a class="section">Use</a>
-        <a href="#tool">Allocation simulator</a>
-        <a href="#flows">Decision flowcharts</a>
+        <a href="#tool">{{ c.sections.tool.heading }}</a>
+        <a href="#flows">{{ c.sections.flows.heading }}</a>
         <a href="#scenarios">Scenario library</a>
         <a routerLink="/auto-allocation/qa">QA test runner</a>
+        @if (extraSections.length) {
+          <a class="section">More</a>
+          @for (s of extraSections; track s.id) {
+            <a [href]="'#' + s.id">{{ s.heading }}</a>
+          }
+        }
       </nav>
     </aside>
 
@@ -47,111 +64,121 @@ import content from '../../content/auto-allocation-guide.json';
       <div class="hero">
         <h1>{{ c.hero.title }}</h1>
         <p [innerHTML]="md(c.hero.lead)"></p>
-        <span class="pill">Intended behavior reference · Standard &amp; Store orders</span>
+        <span class="pill">{{ c.hero.pill }}</span>
       </div>
 
       <section id="start">
-        <h2><span class="num">01</span>How auto-allocation works, in one minute</h2>
+        <h2><span class="num">01</span>{{ c.sections.start.heading }}</h2>
         <p class="lead" [innerHTML]="md(c.sections.start.lead)"></p>
         <div class="info" [innerHTML]="md(c.sections.start.info)"></div>
         <p [innerHTML]="md(c.sections.start.body)"></p>
       </section>
 
       <section id="prereq">
-        <h2><span class="num">02</span>Prerequisites, when auto-allocation runs</h2>
+        <h2><span class="num">02</span>{{ c.sections.prereq.heading }}</h2>
         <p class="lead" [innerHTML]="md(c.sections.prereq.lead)"></p>
         <table>
           <thead><tr><th style="width:300px">Requirement</th><th>Detail</th></tr></thead>
           <tbody>
-            <tr><td><b>Order is Pending</b></td><td>Allocation happens when a pending order is booked.</td></tr>
-            <tr><td><b>Auto Allocation is ON</b></td><td>Enabled in Admin, Antera Admin, Settings, Orders, Inventory Sourcing.</td></tr>
-            <tr><td><b>Order has line items</b></td><td>There must be at least one line item to evaluate.</td></tr>
-            <tr><td><b>Product Li Type = Stock</b></td><td>Set on the product (the Li Type field). Only Stock-type products are eligible.</td></tr>
+            @for (row of c.sections.prereq.table; track row.requirement) {
+              <tr>
+                <td><b>{{ row.requirement }}</b></td>
+                <td [innerHTML]="md(row.detail)"></td>
+              </tr>
+            }
           </tbody>
         </table>
         <div class="note" [innerHTML]="md(c.sections.prereq.note)"></div>
       </section>
 
       <section id="flags">
-        <h2><span class="num">03</span>Settings &amp; flags</h2>
+        <h2><span class="num">03</span>{{ c.sections.flags.heading }}</h2>
         <p class="lead" [innerHTML]="md(c.sections.flags.lead)"></p>
         <table>
           <thead><tr><th style="width:230px">Setting</th><th>What it does</th><th style="width:260px">Where to find it</th></tr></thead>
           <tbody>
-            <tr><td><b>Auto Allocation</b></td><td>Master switch. Must be ON for allocation to run.</td><td><span class="loc-inline">Admin ▸ Antera Admin ▸ Settings ▸ Orders</span></td></tr>
-            <tr><td><b>Allow No/Low Stock Allocation</b></td><td>Backorder mode. Keeps one Stock line and records shortfalls as backorders.</td><td><span class="loc-inline">Admin ▸ Settings ▸ Orders</span></td></tr>
-            <tr><td><b>Li Type = Stock</b></td><td>Makes a product eligible for allocation.</td><td><span class="loc-inline">Product record · Li Type field</span></td></tr>
-            <tr><td><b>Matrix PO type (Source)</b></td><td>Per line-item: source from Stock or DropShip.</td><td><span class="loc-inline">Order ▸ line item · Source</span></td></tr>
-            <tr><td><b>Warehouse priority &amp; Default</b></td><td>Global priority via the Auto Allocation Priority column; Default toggle marks the fallback.</td><td><span class="loc-inline">Admin ▸ Configuration ▸ Warehouse</span></td></tr>
-            <tr><td><b>Customer override + Search Warehouses for Stock</b></td><td>Per-customer priority; optional scan of all warehouses.</td><td><span class="loc-inline">Customer ▸ Warehouse tab</span></td></tr>
-            <tr><td><b>Share Parent Inventory</b></td><td>Lets a child pull inventory from its parent at booking.</td><td><span class="loc-inline">Product ▸ Child Product Settings</span></td></tr>
-            <tr><td><b>Allow Transfer Parent Inventory to Child Pre-Decorated Products</b> <span class="badge">Aether Orders Only</span></td><td>System-level enable for parent to child transfer.</td><td><span class="loc-inline">Admin ▸ Settings ▸ Orders</span></td></tr>
+            @for (row of c.sections.flags.table; track row.setting) {
+              <tr>
+                <td><b>{{ row.setting }}</b></td>
+                <td [innerHTML]="md(row.what_it_does)"></td>
+                <td><span class="loc-inline">{{ row.where }}</span></td>
+              </tr>
+            }
           </tbody>
         </table>
 
-        <h3>Setting locations</h3>
-        <p style="margin:0 0 6px;color:var(--muted);font-size:13.5px">Where each setting lives in Antera. Click any image to open it full size.</p>
+        <h3>{{ c.sections.flags.locations_heading }}</h3>
+        <p style="margin:0 0 6px;color:var(--muted);font-size:13.5px">{{ c.sections.flags.locations_subtitle }}</p>
         <div class="shotgrid">
-          <div class="shot"><b>Auto Allocation · Backorder · Parent-transfer</b>Admin ▸ Settings ▸ Orders ▸ Inventory Sourcing<a class="img" href="assets/screenshots/auto-allocation-backorder.png" target="_blank" rel="noopener"><img src="assets/screenshots/auto-allocation-backorder.png" alt="Inventory Sourcing settings" /></a></div>
-          <div class="shot"><b>Li Type = Stock</b>Product record · Li Type field<a class="img" href="assets/screenshots/li-type-stock.png" target="_blank" rel="noopener"><img src="assets/screenshots/li-type-stock.png" alt="Product Li Type = Stock" /></a></div>
-          <div class="shot"><b>Matrix PO type / Source</b>Order ▸ line item · Source<a class="img" href="assets/screenshots/matrix-po-type.png" target="_blank" rel="noopener"><img src="assets/screenshots/matrix-po-type.png" alt="Source Stock and DropShip" /></a></div>
-          <div class="shot"><b>Global warehouses · Default · Priority</b>Admin ▸ Configuration ▸ Warehouse<a class="img" href="assets/screenshots/global-warehouses-default.png" target="_blank" rel="noopener"><img src="assets/screenshots/global-warehouses-default.png" alt="Warehouse config" /></a></div>
-          <div class="shot"><b>Customer override + Search Warehouses</b>Customer ▸ Warehouse tab<a class="img" href="assets/screenshots/customer-warehouse-search.png" target="_blank" rel="noopener"><img src="assets/screenshots/customer-warehouse-search.png" alt="Customer warehouse tab" /></a></div>
-          <div class="shot"><b>Share Parent Inventory</b>Product ▸ Child Product Settings<a class="img" href="assets/screenshots/share-parent-inventory.png" target="_blank" rel="noopener"><img src="assets/screenshots/share-parent-inventory.png" alt="Share Parent Inventory toggle" /></a></div>
+          @for (shot of c.sections.flags.shots; track shot.title) {
+            <div class="shot">
+              <b>{{ shot.title }}</b>{{ shot.location }}
+              <a class="img" [href]="shot.image" target="_blank" rel="noopener">
+                <img [src]="shot.image" [alt]="shot.alt" />
+              </a>
+            </div>
+          }
         </div>
       </section>
 
       <section id="outcomes">
-        <h2><span class="num">04</span>The allocation outcomes</h2>
+        <h2><span class="num">04</span>{{ c.sections.outcomes.heading }}</h2>
         <p class="lead" [innerHTML]="md(c.sections.outcomes.lead)"></p>
         <div class="grid g3">
-          <div class="card doc-card"><span class="tag">Full</span><h4>All Stock</h4><p>Stock covers the row. It stays Stock and inventory is reserved. No DropShip line.</p></div>
-          <div class="card doc-card"><span class="tag">Partial · default</span><h4>Stock + DropShip line</h4><p>The covered quantity stays Stock; the shortfall (plus any fully-unstocked sizes) moves to a new DropShip line.</p></div>
-          <div class="card doc-card"><span class="tag">Partial · backorder</span><h4>Stock + Backorder</h4><p>With Backorder mode on, nothing splits off. The line stays a single Stock line and the shortfall is stored as a backorder (bell).</p></div>
+          @for (card of c.sections.outcomes.cards; track card.tag) {
+            <div class="card doc-card">
+              <span class="tag">{{ card.tag }}</span>
+              <h4>{{ card.title }}</h4>
+              <p [innerHTML]="md(card.body)"></p>
+            </div>
+          }
         </div>
         <div class="note" [innerHTML]="md(c.sections.outcomes.note)"></div>
       </section>
 
       <section id="warehouse">
-        <h2><span class="num">05</span>Warehouse priority &amp; fallback</h2>
+        <h2><span class="num">05</span>{{ c.sections.warehouse.heading }}</h2>
         <p class="lead" [innerHTML]="md(c.sections.warehouse.lead)"></p>
         <table>
           <thead><tr><th style="width:60px">Order</th><th>Warehouse</th><th>Notes</th></tr></thead>
           <tbody>
-            <tr><td><b>1</b></td><td>Primary</td><td>Customer override if set, otherwise global.</td></tr>
-            <tr><td><b>2</b></td><td>Secondary</td><td>Customer override or global.</td></tr>
-            <tr><td><b>3</b></td><td>Tertiary</td><td>Customer override or global.</td></tr>
-            <tr><td><b>4</b></td><td>Any other warehouse</td><td>Only if Search Warehouses for Stock is ON.</td></tr>
-            <tr><td><b>5</b></td><td>Default warehouse</td><td>Final fallback. If empty too, the row follows DropShip / Backorder rules.</td></tr>
+            @for (row of c.sections.warehouse.table; track row.order) {
+              <tr>
+                <td><b>{{ row.order }}</b></td>
+                <td>{{ row.warehouse }}</td>
+                <td [innerHTML]="md(row.notes)"></td>
+              </tr>
+            }
           </tbody>
         </table>
         <div class="info" [innerHTML]="md(c.sections.warehouse.info)"></div>
       </section>
 
       <section id="parent">
-        <h2><span class="num">06</span>Parent to Child inventory transfer</h2>
+        <h2><span class="num">06</span>{{ c.sections.parent.heading }}</h2>
         <p class="lead" [innerHTML]="md(c.sections.parent.lead)"></p>
         <table>
           <thead><tr><th style="width:280px">Rule</th><th>Behavior</th></tr></thead>
           <tbody>
-            <tr><td><b>Only Stock-type lines</b></td><td>If the line's Matrix PO type is DropShip, no transfer happens.</td></tr>
-            <tr><td><b>Transfer amount</b></td><td>min(shortfall, parent inventory). If the parent can't cover it all, the rest is backordered/dropshipped.</td></tr>
-            <tr><td><b>Warehouse type must match</b></td><td>Normally only works when parent and child stock are the same warehouse type (Customer-owned, Distributor-owned, Vendor-owned).</td></tr>
-            <tr><td><b>Unless the child has zero</b></td><td>If the child has 0 stock for the items, it can pull from the parent regardless of warehouse type.</td></tr>
-            <tr><td><b>Unreserve does not reverse it</b></td><td>If you unreserve the line after booking, the child keeps the transferred inventory.</td></tr>
+            @for (row of c.sections.parent.table; track row.rule) {
+              <tr>
+                <td><b>{{ row.rule }}</b></td>
+                <td [innerHTML]="md(row.behavior)"></td>
+              </tr>
+            }
           </tbody>
         </table>
         <div class="info" [innerHTML]="md(c.sections.parent.info)"></div>
       </section>
 
       <section id="tool">
-        <h2><span class="num">07</span>Allocation simulator</h2>
+        <h2><span class="num">07</span>{{ c.sections.tool.heading }}</h2>
         <p class="lead" [innerHTML]="md(c.sections.tool.lead)"></p>
         <app-allocation-simulator />
       </section>
 
       <section id="flows">
-        <h2><span class="num">08</span>Decision flowcharts</h2>
+        <h2><span class="num">08</span>{{ c.sections.flows.heading }}</h2>
         <p class="lead" [innerHTML]="md(c.sections.flows.lead)"></p>
         <app-flow-tabs [flows]="flows" [tabs]="flowTabs" />
       </section>
@@ -172,7 +199,17 @@ import content from '../../content/auto-allocation-guide.json';
         </table>
       </section>
 
-      <div class="footer">Auto Allocation Guide · QA &amp; Support reference · Describes intended system behavior.</div>
+      @for (s of extraSections; track s.id) {
+        <section [id]="s.id">
+          <h2>{{ s.heading }}</h2>
+          @if (s.lead) { <p class="lead" [innerHTML]="md(s.lead)"></p> }
+          @if (s.info) { <div class="info" [innerHTML]="md(s.info)"></div> }
+          @if (s.note) { <div class="note" [innerHTML]="md(s.note)"></div> }
+          @if (s.body) { <p [innerHTML]="md(s.body)"></p> }
+        </section>
+      }
+
+      <div class="footer">{{ c.footer }}</div>
     </main>
   </div>`,
 })
@@ -186,6 +223,7 @@ export class AutoAllocationGuideComponent {
   ];
   scenQuery = '';
   md(s: string): string { return mdInline(s); }
+  get extraSections(): ExtraSection[] { return this.c.extra_sections ?? []; }
   get filteredScenarios(): QaScenario[] {
     const q = this.scenQuery.toLowerCase();
     return ALLOCATION_QA_SCENARIOS.filter(s => !q || (s.group + ' ' + s.cond.join(' ') + ' ' + s.expected + ' ' + s.title).toLowerCase().includes(q));

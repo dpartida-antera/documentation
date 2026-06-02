@@ -36,6 +36,8 @@ collections:
             fields:
               - { name: title, label: Page title, widget: string }
               - { name: lead, label: Intro paragraph, widget: markdown }
+              - { name: pill, label: Pill badge text, widget: string }
+
           - name: sections
             label: Sections
             widget: object
@@ -44,41 +46,110 @@ collections:
                 label: "01 How shipping works"
                 widget: object
                 fields:
-                  - { name: lead, label: Lead, widget: markdown }
-                  - { name: info, label: Highlighted callout, widget: markdown }
+                  - { name: heading, label: Section heading, widget: string }
+                  - { name: lead, label: Lead paragraph, widget: markdown }
+                  - { name: info, label: Info callout (blue), widget: markdown }
                   - { name: body, label: Closing paragraph, widget: markdown }
+
               - name: docs
                 label: "02 The three PO documents"
                 widget: object
                 fields:
-                  - { name: lead, label: Lead, widget: markdown }
-                  - { name: note, label: Note callout, widget: markdown }
+                  - { name: heading, label: Section heading, widget: string }
+                  - { name: lead, label: Lead paragraph, widget: markdown }
+                  - name: cards
+                    label: Document cards
+                    widget: list
+                    label_singular: Card
+                    summary: "{{fields.tag}} – {{fields.title}}"
+                    fields:
+                      - { name: tag, label: Tag label, widget: string }
+                      - { name: title, label: Card title, widget: string }
+                      - { name: body, label: Card body, widget: markdown }
+                  - { name: note, label: Note callout (yellow), widget: markdown }
+
               - name: flags
                 label: "03 Settings & flags"
                 widget: object
                 fields:
-                  - { name: lead, label: Lead, widget: markdown }
+                  - { name: heading, label: Section heading, widget: string }
+                  - { name: lead, label: Lead paragraph, widget: markdown }
+                  - name: table
+                    label: Flags table rows
+                    widget: list
+                    label_singular: Row
+                    summary: "{{fields.flag}}"
+                    fields:
+                      - { name: flag, label: Flag name, widget: string }
+                      - { name: meaning, label: What it means, widget: markdown }
+                      - { name: effect, label: Effect when ON, widget: markdown }
+
               - name: priority
                 label: "04 Priority rules"
                 widget: object
                 fields:
-                  - { name: lead, label: Lead, widget: markdown }
-                  - { name: note, label: Note callout, widget: markdown }
+                  - { name: heading, label: Section heading, widget: string }
+                  - { name: lead, label: Lead paragraph, widget: markdown }
+                  - name: cards
+                    label: Priority cards
+                    widget: list
+                    label_singular: Card
+                    summary: "{{fields.tag}} – {{fields.title}}"
+                    fields:
+                      - { name: tag, label: Tag label, widget: string }
+                      - { name: title, label: Card title, widget: string }
+                      - { name: body, label: Card body, widget: markdown }
+                  - { name: note, label: Note callout (yellow), widget: markdown }
+
               - name: tool
                 label: "05 Determination tool"
                 widget: object
                 fields:
-                  - { name: lead, label: Lead, widget: markdown }
+                  - { name: heading, label: Section heading, widget: string }
+                  - { name: lead, label: Lead paragraph, widget: markdown }
+
               - name: flows
                 label: "06 Decision flowcharts"
                 widget: object
                 fields:
-                  - { name: lead, label: Lead, widget: markdown }
+                  - { name: heading, label: Section heading, widget: string }
+                  - { name: lead, label: Lead paragraph, widget: markdown }
+
               - name: scenarios
                 label: "07 Scenario library"
                 widget: object
                 fields:
-                  - { name: lead, label: Lead, widget: markdown }
+                  - { name: heading, label: Section heading, widget: string }
+                  - { name: lead, label: Lead paragraph, widget: markdown }
+
+              - name: glossary
+                label: "08 Glossary"
+                widget: object
+                fields:
+                  - { name: heading, label: Section heading, widget: string }
+                  - name: rows
+                    label: Glossary entries
+                    widget: list
+                    label_singular: Entry
+                    summary: "{{fields.term}}"
+                    fields:
+                      - { name: term, label: Term, widget: string }
+                      - { name: definition, label: Definition, widget: markdown }
+
+          - name: extra_sections
+            label: Custom sections
+            widget: list
+            label_singular: Section
+            summary: "{{fields.heading}}"
+            fields:
+              - { name: id, label: "Section ID (for anchor links, e.g. my-section)", widget: string }
+              - { name: heading, label: Section heading, widget: string }
+              - { name: lead, label: Lead paragraph, widget: markdown, required: false }
+              - { name: info, label: Info callout (blue), widget: markdown, required: false }
+              - { name: note, label: Note callout (yellow), widget: markdown, required: false }
+              - { name: body, label: Body paragraph, widget: markdown, required: false }
+
+          - { name: footer, label: Footer text, widget: string }
 
       - name: auto-allocation
         label: Auto Allocation Guide
@@ -91,6 +162,8 @@ collections:
             fields:
               - { name: title, label: Page title, widget: string }
               - { name: lead, label: Intro paragraph, widget: markdown }
+              - { name: pill, label: Pill badge text, widget: string }
+
           - name: sections
             label: Sections
             widget: object
@@ -99,45 +172,130 @@ collections:
                 label: "01 How auto-allocation works"
                 widget: object
                 fields:
-                  - { name: lead, label: Lead, widget: markdown }
-                  - { name: info, label: Highlighted callout, widget: markdown }
+                  - { name: heading, label: Section heading, widget: string }
+                  - { name: lead, label: Lead paragraph, widget: markdown }
+                  - { name: info, label: Info callout (blue), widget: markdown }
                   - { name: body, label: Closing paragraph, widget: markdown }
+
               - name: prereq
                 label: "02 Prerequisites"
                 widget: object
                 fields:
-                  - { name: lead, label: Lead, widget: markdown }
-                  - { name: note, label: Note callout, widget: markdown }
+                  - { name: heading, label: Section heading, widget: string }
+                  - { name: lead, label: Lead paragraph, widget: markdown }
+                  - name: table
+                    label: Prerequisites table rows
+                    widget: list
+                    label_singular: Row
+                    summary: "{{fields.requirement}}"
+                    fields:
+                      - { name: requirement, label: Requirement, widget: string }
+                      - { name: detail, label: Detail, widget: markdown }
+                  - { name: note, label: Note callout (yellow), widget: markdown }
+
               - name: flags
                 label: "03 Settings & flags"
                 widget: object
                 fields:
-                  - { name: lead, label: Lead, widget: markdown }
+                  - { name: heading, label: Section heading, widget: string }
+                  - { name: lead, label: Lead paragraph, widget: markdown }
+                  - name: table
+                    label: Settings table rows
+                    widget: list
+                    label_singular: Row
+                    summary: "{{fields.setting}}"
+                    fields:
+                      - { name: setting, label: Setting name, widget: string }
+                      - { name: what_it_does, label: What it does, widget: markdown }
+                      - { name: where, label: Where to find it, widget: string }
+                  - { name: locations_heading, label: Screenshot section heading, widget: string }
+                  - { name: locations_subtitle, label: Screenshot section subtitle, widget: string }
+                  - name: shots
+                    label: Setting location screenshots
+                    widget: list
+                    label_singular: Screenshot
+                    summary: "{{fields.title}}"
+                    fields:
+                      - { name: title, label: Title, widget: string }
+                      - { name: location, label: Location path, widget: string }
+                      - { name: image, label: Screenshot image, widget: image }
+                      - { name: alt, label: Alt text, widget: string }
+
               - name: outcomes
                 label: "04 Allocation outcomes"
                 widget: object
                 fields:
-                  - { name: lead, label: Lead, widget: markdown }
-                  - { name: note, label: Note callout, widget: markdown }
+                  - { name: heading, label: Section heading, widget: string }
+                  - { name: lead, label: Lead paragraph, widget: markdown }
+                  - name: cards
+                    label: Outcome cards
+                    widget: list
+                    label_singular: Card
+                    summary: "{{fields.tag}} – {{fields.title}}"
+                    fields:
+                      - { name: tag, label: Tag label, widget: string }
+                      - { name: title, label: Card title, widget: string }
+                      - { name: body, label: Card body, widget: markdown }
+                  - { name: note, label: Note callout (yellow), widget: markdown }
+
               - name: warehouse
                 label: "05 Warehouse priority"
                 widget: object
                 fields:
-                  - { name: lead, label: Lead, widget: markdown }
-                  - { name: info, label: Info callout, widget: markdown }
+                  - { name: heading, label: Section heading, widget: string }
+                  - { name: lead, label: Lead paragraph, widget: markdown }
+                  - name: table
+                    label: Warehouse priority table rows
+                    widget: list
+                    label_singular: Row
+                    summary: "{{fields.order}} – {{fields.warehouse}}"
+                    fields:
+                      - { name: order, label: Priority order, widget: string }
+                      - { name: warehouse, label: Warehouse, widget: string }
+                      - { name: notes, label: Notes, widget: markdown }
+                  - { name: info, label: Info callout (blue), widget: markdown }
+
               - name: parent
                 label: "06 Parent to Child transfer"
                 widget: object
                 fields:
-                  - { name: lead, label: Lead, widget: markdown }
-                  - { name: info, label: Info callout, widget: markdown }
+                  - { name: heading, label: Section heading, widget: string }
+                  - { name: lead, label: Lead paragraph, widget: markdown }
+                  - name: table
+                    label: Transfer rules table rows
+                    widget: list
+                    label_singular: Row
+                    summary: "{{fields.rule}}"
+                    fields:
+                      - { name: rule, label: Rule, widget: string }
+                      - { name: behavior, label: Behavior, widget: markdown }
+                  - { name: info, label: Info callout (blue), widget: markdown }
+
               - name: tool
                 label: "07 Allocation simulator"
                 widget: object
                 fields:
-                  - { name: lead, label: Lead, widget: markdown }
+                  - { name: heading, label: Section heading, widget: string }
+                  - { name: lead, label: Lead paragraph, widget: markdown }
+
               - name: flows
                 label: "08 Decision flowcharts"
                 widget: object
                 fields:
-                  - { name: lead, label: Lead, widget: markdown }
+                  - { name: heading, label: Section heading, widget: string }
+                  - { name: lead, label: Lead paragraph, widget: markdown }
+
+          - name: extra_sections
+            label: Custom sections
+            widget: list
+            label_singular: Section
+            summary: "{{fields.heading}}"
+            fields:
+              - { name: id, label: "Section ID (for anchor links, e.g. my-section)", widget: string }
+              - { name: heading, label: Section heading, widget: string }
+              - { name: lead, label: Lead paragraph, widget: markdown, required: false }
+              - { name: info, label: Info callout (blue), widget: markdown, required: false }
+              - { name: note, label: Note callout (yellow), widget: markdown, required: false }
+              - { name: body, label: Body paragraph, widget: markdown, required: false }
+
+          - { name: footer, label: Footer text, widget: string }

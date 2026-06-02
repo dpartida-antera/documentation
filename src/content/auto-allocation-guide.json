@@ -1,38 +1,195 @@
 {
   "hero": {
     "title": "Auto Allocation Guide",
-    "lead": "How the system decides, line item by line item, _what ships from stock and what gets dropshipped_ when you book a pending order, including partial stock, backorders, warehouse priority, and pulling inventory from a parent."
+    "lead": "How the system decides, line item by line item, _what ships from stock and what gets dropshipped_ when you book a pending order, including partial stock, backorders, warehouse priority, and pulling inventory from a parent.",
+    "pill": "Intended behavior reference · Standard & Store orders"
   },
   "sections": {
     "start": {
+      "heading": "How auto-allocation works, in one minute",
       "lead": "When you **book** a pending order, auto-allocation walks every line item, and every size within it, and asks one question: **can I cover this from stock?** Then it reserves what it can and routes the rest.",
       "info": "**Three outcomes per size, decided by available stock:** 1) **Enough stock**, the row stays Stock and inventory is reserved. 2) **Partial stock**, the covered quantity stays Stock and the shortfall becomes a DropShip line (or a Backorder, if that mode is on). 3) **No stock**, DropShip / Backorder / in-place flip depending on settings.",
       "body": "The line-item \"source from stock vs dropship\" value is the **Matrix PO type**, shown as **Source** on the order line. On the product itself, the eligibility field is **Li Type**."
     },
     "prereq": {
+      "heading": "Prerequisites, when auto-allocation runs",
       "lead": "All of these must be true, or the order books without any auto-allocation happening.",
+      "table": [
+        {
+          "requirement": "Order is Pending",
+          "detail": "Allocation happens when a pending order is booked."
+        },
+        {
+          "requirement": "Auto Allocation is ON",
+          "detail": "Enabled in Admin, Antera Admin, Settings, Orders, Inventory Sourcing."
+        },
+        {
+          "requirement": "Order has line items",
+          "detail": "There must be at least one line item to evaluate."
+        },
+        {
+          "requirement": "Product Li Type = Stock",
+          "detail": "Set on the product (the Li Type field). Only Stock-type products are eligible."
+        }
+      ],
       "note": "**Aether Store Orders** have a special path: a zero-stock line is sent to backorder even when the system-level auto-allocation setting is OFF (scenarios SC-10 and SC-11)."
     },
     "flags": {
-      "lead": "Each of these changes how a shortfall is handled or where stock is pulled from. Screenshots of where each setting lives are below."
+      "heading": "Settings & flags",
+      "lead": "Each of these changes how a shortfall is handled or where stock is pulled from. Screenshots of where each setting lives are below.",
+      "table": [
+        {
+          "setting": "Auto Allocation",
+          "what_it_does": "Master switch. Must be ON for allocation to run.",
+          "where": "Admin ▸ Antera Admin ▸ Settings ▸ Orders"
+        },
+        {
+          "setting": "Allow No/Low Stock Allocation",
+          "what_it_does": "Backorder mode. Keeps one Stock line and records shortfalls as backorders.",
+          "where": "Admin ▸ Settings ▸ Orders"
+        },
+        {
+          "setting": "Li Type = Stock",
+          "what_it_does": "Makes a product eligible for allocation.",
+          "where": "Product record · Li Type field"
+        },
+        {
+          "setting": "Matrix PO type (Source)",
+          "what_it_does": "Per line-item: source from Stock or DropShip.",
+          "where": "Order ▸ line item · Source"
+        },
+        {
+          "setting": "Warehouse priority & Default",
+          "what_it_does": "Global priority via the Auto Allocation Priority column; Default toggle marks the fallback.",
+          "where": "Admin ▸ Configuration ▸ Warehouse"
+        },
+        {
+          "setting": "Customer override + Search Warehouses for Stock",
+          "what_it_does": "Per-customer priority; optional scan of all warehouses.",
+          "where": "Customer ▸ Warehouse tab"
+        },
+        {
+          "setting": "Share Parent Inventory",
+          "what_it_does": "Lets a child pull inventory from its parent at booking.",
+          "where": "Product ▸ Child Product Settings"
+        },
+        {
+          "setting": "Allow Transfer Parent Inventory to Child Pre-Decorated Products",
+          "what_it_does": "System-level enable for parent to child transfer. Aether Orders Only.",
+          "where": "Admin ▸ Settings ▸ Orders"
+        }
+      ],
+      "locations_heading": "Setting locations",
+      "locations_subtitle": "Where each setting lives in Antera. Click any image to open it full size.",
+      "shots": [
+        {
+          "title": "Auto Allocation · Backorder · Parent-transfer",
+          "location": "Admin ▸ Settings ▸ Orders ▸ Inventory Sourcing",
+          "image": "assets/screenshots/auto-allocation-backorder.png",
+          "alt": "Inventory Sourcing settings"
+        },
+        {
+          "title": "Li Type = Stock",
+          "location": "Product record · Li Type field",
+          "image": "assets/screenshots/li-type-stock.png",
+          "alt": "Product Li Type = Stock"
+        },
+        {
+          "title": "Matrix PO type / Source",
+          "location": "Order ▸ line item · Source",
+          "image": "assets/screenshots/matrix-po-type.png",
+          "alt": "Source Stock and DropShip"
+        },
+        {
+          "title": "Global warehouses · Default · Priority",
+          "location": "Admin ▸ Configuration ▸ Warehouse",
+          "image": "assets/screenshots/global-warehouses-default.png",
+          "alt": "Warehouse config"
+        },
+        {
+          "title": "Customer override + Search Warehouses",
+          "location": "Customer ▸ Warehouse tab",
+          "image": "assets/screenshots/customer-warehouse-search.png",
+          "alt": "Customer warehouse tab"
+        },
+        {
+          "title": "Share Parent Inventory",
+          "location": "Product ▸ Child Product Settings",
+          "image": "assets/screenshots/share-parent-inventory.png",
+          "alt": "Share Parent Inventory toggle"
+        }
+      ]
     },
     "outcomes": {
+      "heading": "The allocation outcomes",
       "lead": "For each size, allocated = min(required, available stock) and remainder = required minus allocated. What happens to the remainder is the whole story.",
+      "cards": [
+        {
+          "tag": "Full",
+          "title": "All Stock",
+          "body": "Stock covers the row. It stays Stock and inventory is reserved. No DropShip line."
+        },
+        {
+          "tag": "Partial · default",
+          "title": "Stock + DropShip line",
+          "body": "The covered quantity stays Stock; the shortfall (plus any fully-unstocked sizes) moves to a new DropShip line."
+        },
+        {
+          "tag": "Partial · backorder",
+          "title": "Stock + Backorder",
+          "body": "With Backorder mode on, nothing splits off. The line stays a single Stock line and the shortfall is stored as a backorder (bell)."
+        }
+      ],
       "note": "**When no size has any stock** the entire original line flips to DropShip in-place (no separate line). With a Default warehouse and Backorder mode, the full quantity is backordered against the Default warehouse instead."
     },
     "warehouse": {
+      "heading": "Warehouse priority & fallback",
       "lead": "Available stock depends on which warehouse the system checks. It walks a priority list and stops at the first that can cover the row.",
+      "table": [
+        { "order": "1", "warehouse": "Primary", "notes": "Customer override if set, otherwise global." },
+        { "order": "2", "warehouse": "Secondary", "notes": "Customer override or global." },
+        { "order": "3", "warehouse": "Tertiary", "notes": "Customer override or global." },
+        { "order": "4", "warehouse": "Any other warehouse", "notes": "Only if Search Warehouses for Stock is ON." },
+        { "order": "5", "warehouse": "Default warehouse", "notes": "Final fallback. If empty too, the row follows DropShip / Backorder rules." }
+      ],
       "info": "**Customer override wins:** if a customer has its own priority set, the global list is not consulted (scenario SC-9)."
     },
     "parent": {
+      "heading": "Parent to Child inventory transfer",
       "lead": "With Share Parent Inventory on, a child that is short on stock can pull inventory from its parent at booking, before the shortfall is dropshipped or backordered.",
+      "table": [
+        {
+          "rule": "Only Stock-type lines",
+          "behavior": "If the line's Matrix PO type is DropShip, no transfer happens."
+        },
+        {
+          "rule": "Transfer amount",
+          "behavior": "min(shortfall, parent inventory). If the parent can't cover it all, the rest is backordered/dropshipped."
+        },
+        {
+          "rule": "Warehouse type must match",
+          "behavior": "Normally only works when parent and child stock are the same warehouse type (Customer-owned, Distributor-owned, Vendor-owned)."
+        },
+        {
+          "rule": "Unless the child has zero",
+          "behavior": "If the child has 0 stock for the items, it can pull from the parent regardless of warehouse type."
+        },
+        {
+          "rule": "Unreserve does not reverse it",
+          "behavior": "If you unreserve the line after booking, the child keeps the transferred inventory."
+        }
+      ],
       "info": "**Two switches enable this:** the product opt-in Share Parent Inventory (Product, Child Product Settings) and the system-level Allow Transfer Parent Inventory to Child Pre-Decorated Products (Admin, Settings, Orders). Per that setting's label, the transfer is scoped to Aether orders and pre-decorated child products."
     },
     "tool": {
+      "heading": "Allocation simulator",
       "lead": "Enter the required and in-stock quantities per size, flip the flags, and see exactly how the line item is rewritten when the order books."
     },
     "flows": {
+      "heading": "Decision flowcharts",
       "lead": "The same logic, drawn out. Diamonds are checks; green boxes are outcomes."
     }
-  }
+  },
+  "extra_sections": [],
+  "footer": "Auto Allocation Guide · QA & Support reference · Describes intended system behavior."
 }

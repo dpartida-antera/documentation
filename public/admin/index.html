@@ -26,7 +26,9 @@
 
       renderField: function (key, value) {
         if (!value) return null;
-        var isLead = key === 'lead';
+        // Skip arrays (cards, table rows, shots) and non-string values — rendered separately
+        if (typeof value !== 'string') return null;
+        var isLead = key === 'lead' || key === 'heading';
         var style = isLead
           ? { margin: '6px 0' }
           : {
@@ -35,7 +37,9 @@
               borderRadius: '6px',
               margin: '8px 0',
             };
-        return h('div', { key: key, style: style }, this.md(value));
+        return h('div', { key: key, style: style }, key === 'heading'
+          ? h('strong', {}, value)
+          : this.md(value));
       },
 
       render: function () {
