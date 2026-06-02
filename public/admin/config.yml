@@ -17,7 +17,7 @@ backend:
 
 local_backend: true
 
-media_folder: "angular-app/public/assets/uploads"
+media_folder: "public/assets/uploads"
 public_folder: "/assets/uploads"
 
 collections:
@@ -27,7 +27,7 @@ collections:
     files:
       - name: shipping
         label: PO Shipping Address Guide
-        file: angular-app/src/content/shipping-guide.json
+        file: src/content/shipping-guide.json
         description: Text shown on the PO Shipping Address guide page.
         fields:
           - name: hero
@@ -82,7 +82,7 @@ collections:
 
       - name: auto-allocation
         label: Auto Allocation Guide
-        file: angular-app/src/content/auto-allocation-guide.json
+        file: src/content/auto-allocation-guide.json
         description: Text shown on the Auto Allocation guide page.
         fields:
           - name: hero

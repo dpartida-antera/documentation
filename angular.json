@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "antera-docs": {
+    "documentation-app": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -17,7 +17,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/antera-docs",
+            "outputPath": "dist/documentation-app",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -64,10 +64,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "antera-docs:build:production"
+              "buildTarget": "documentation-app:build:production"
             },
             "development": {
-              "buildTarget": "antera-docs:build:development"
+              "buildTarget": "documentation-app:build:development"
             }
           },
           "defaultConfiguration": "development"

@@ -1,9 +1,9 @@
-name: Deploy Angular app to GitHub Pages
+name: Deploy to GitHub Pages
 
-# This repo (documentation) contains the old static site at the root AND the
-# Angular app in angular-app/. This workflow builds the Angular app from the
-# subfolder and publishes it as the Pages site. Pages "Source" must be set to
-# "GitHub Actions" (Settings -> Pages) for this to take over from the static root.
+# Assumes this angular-app folder is the root of its own GitHub repo.
+# If it is a subfolder of a larger repo, move this file to the repo root's
+# .github/workflows/, add `defaults: { run: { working-directory: angular-app } }`
+# to the build job, and change the artifact path to angular-app/dist/documentation-app/browser.
 
 on:
   push:
@@ -22,27 +22,24 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: angular-app
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
-          cache-dependency-path: angular-app/package-lock.json
       - run: npm ci
       - name: Build
-        # repo is "documentation", so Pages serves it under /documentation/.
+        # base-href must match how Pages serves the repo: a project page is /<repo>/.
+        # For a user/org root page (<user>.github.io) or a custom domain, use "/".
         run: npx ng build --configuration production --base-href "/${{ github.event.repository.name }}/"
       - name: SPA fallback + nojekyll
         run: |
-          cp dist/antera-docs/browser/index.html dist/antera-docs/browser/404.html
-          touch dist/antera-docs/browser/.nojekyll
+          cp dist/documentation-app/browser/index.html dist/documentation-app/browser/404.html
+          touch dist/documentation-app/browser/.nojekyll
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: angular-app/dist/antera-docs/browser
+          path: dist/documentation-app/browser
 
   deploy:
     needs: build

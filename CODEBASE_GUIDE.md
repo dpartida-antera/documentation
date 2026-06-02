@@ -1,6 +1,6 @@
 # Understanding this Angular app (for a Rails developer)
 
-This is a guide to the `angular-app/` project written for someone who knows Rails but not Angular. It explains the mental model, the TypeScript you will see, how the pieces fit, and how to change or extend things.
+This is a guide to this Angular project (the repository root) written for someone who knows Rails but not Angular. It explains the mental model, the TypeScript you will see, how the pieces fit, and how to change or extend things.
 
 ---
 
@@ -212,7 +212,6 @@ This is the payoff of the rebuild: the QA runner exists once, not copy-pasted pe
 ### Run, build, test
 
 ```bash
-cd angular-app
 npm install        # once
 npm start          # dev server with live reload at http://localhost:4200
 npm run build      # production build into dist/

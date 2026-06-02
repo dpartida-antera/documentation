@@ -9,7 +9,6 @@ Built with Angular 19 (standalone components, lazy-loaded routes). The existing 
 Prerequisites: Node 18+ and npm.
 
 ```bash
-cd angular-app
 npm install
 npm start          # ng serve, then open http://localhost:4200
 ```
