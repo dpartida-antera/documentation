@@ -1,0 +1,33 @@
+{
+  "hero": {
+    "title": "PO Shipping Address Guide",
+    "lead": "How the system decides _where every purchase order ships_, written for QA and Support. Start with the mental model, then use the interactive tool to confirm any case in seconds."
+  },
+  "sections": {
+    "start": {
+      "lead": "Every order is broken into one or more **Purchase Orders (POs)**. Each PO is a document telling one party to send goods somewhere. The system answers a single question for each PO: **what address goes in the Ship To block?**",
+      "info": "**The whole system is three inputs feeding one decision.** 1) **Which document** is this (Blank PO, Decorator PO, or Supplier Decorated PO)? 2) **Which flags** are set on the order or product? 3) The system walks a **decision tree** and picks one of seven possible **destination addresses**.",
+      "body": "The goal is to route product through the right hands: a blank garment may need to reach a decorator before it reaches the customer; a finished item may go straight to the buyer; sometimes everything routes back to your own warehouse first."
+    },
+    "docs": {
+      "lead": "A single order can generate more than one of these. Each follows its own decision tree because they sit at different points in the production chain.",
+      "note": "**Multi-decoration chains:** when an item carries decorations from several vendors, POs hand off in sequence, Supplier to Decorator 1 to Decorator 2 to final destination. Only the **final** PO ships to the customer (or Alternate address); every earlier PO ships to the _next_ decorator."
+    },
+    "flags": {
+      "lead": "These are the toggles a CSR sets on the order, product, or partner configuration. Each one can redirect where a PO ships."
+    },
+    "priority": {
+      "lead": "When more than one flag is set, the system resolves conflicts in a fixed order. This single rule explains most \"why did it ship there?\" questions.",
+      "note": "**Within Ship to Us there is a sub-priority:** Destination Warehouse, then Corporate Identity, then Partner Address. The Destination Warehouse step only applies when the admin setting \"Prioritize Warehouse Address on Ship To Us Toggles\" is On."
+    },
+    "tool": {
+      "lead": "Pick a document, flip the flags as they appear on the order, and the tool shows the exact destination, its data source, and the fields you should see in the address block."
+    },
+    "flows": {
+      "lead": "The same logic the tool uses, drawn out. Diamonds are flag checks; green boxes are destinations."
+    },
+    "scenarios": {
+      "lead": "Worked examples of intended behavior. Search by keyword to confirm what should happen for a given flag combination."
+    }
+  }
+}

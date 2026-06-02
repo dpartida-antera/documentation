@@ -1,0 +1,38 @@
+{
+  "hero": {
+    "title": "Auto Allocation Guide",
+    "lead": "How the system decides, line item by line item, _what ships from stock and what gets dropshipped_ when you book a pending order, including partial stock, backorders, warehouse priority, and pulling inventory from a parent."
+  },
+  "sections": {
+    "start": {
+      "lead": "When you **book** a pending order, auto-allocation walks every line item, and every size within it, and asks one question: **can I cover this from stock?** Then it reserves what it can and routes the rest.",
+      "info": "**Three outcomes per size, decided by available stock:** 1) **Enough stock**, the row stays Stock and inventory is reserved. 2) **Partial stock**, the covered quantity stays Stock and the shortfall becomes a DropShip line (or a Backorder, if that mode is on). 3) **No stock**, DropShip / Backorder / in-place flip depending on settings.",
+      "body": "The line-item \"source from stock vs dropship\" value is the **Matrix PO type**, shown as **Source** on the order line. On the product itself, the eligibility field is **Li Type**."
+    },
+    "prereq": {
+      "lead": "All of these must be true, or the order books without any auto-allocation happening.",
+      "note": "**Aether Store Orders** have a special path: a zero-stock line is sent to backorder even when the system-level auto-allocation setting is OFF (scenarios SC-10 and SC-11)."
+    },
+    "flags": {
+      "lead": "Each of these changes how a shortfall is handled or where stock is pulled from. Screenshots of where each setting lives are below."
+    },
+    "outcomes": {
+      "lead": "For each size, allocated = min(required, available stock) and remainder = required minus allocated. What happens to the remainder is the whole story.",
+      "note": "**When no size has any stock** the entire original line flips to DropShip in-place (no separate line). With a Default warehouse and Backorder mode, the full quantity is backordered against the Default warehouse instead."
+    },
+    "warehouse": {
+      "lead": "Available stock depends on which warehouse the system checks. It walks a priority list and stops at the first that can cover the row.",
+      "info": "**Customer override wins:** if a customer has its own priority set, the global list is not consulted (scenario SC-9)."
+    },
+    "parent": {
+      "lead": "With Share Parent Inventory on, a child that is short on stock can pull inventory from its parent at booking, before the shortfall is dropshipped or backordered.",
+      "info": "**Two switches enable this:** the product opt-in Share Parent Inventory (Product, Child Product Settings) and the system-level Allow Transfer Parent Inventory to Child Pre-Decorated Products (Admin, Settings, Orders). Per that setting's label, the transfer is scoped to Aether orders and pre-decorated child products."
+    },
+    "tool": {
+      "lead": "Enter the required and in-stock quantities per size, flip the flags, and see exactly how the line item is rewritten when the order books."
+    },
+    "flows": {
+      "lead": "The same logic, drawn out. Diamonds are checks; green boxes are outcomes."
+    }
+  }
+}

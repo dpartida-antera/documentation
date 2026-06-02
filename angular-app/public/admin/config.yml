@@ -1,0 +1,143 @@
+# Decap CMS configuration.
+#
+# LOCAL EDITING (no login, for trying it out):
+#   1) cd angular-app && npx decap-server      (leave running)
+#   2) in another terminal: npm start
+#   3) open http://localhost:4200/admin/
+#   With local_backend on, saves write straight to the JSON files in src/content/.
+#
+# PRODUCTION (real non-dev editors): set the github backend below to your repo and
+# remove (or keep) local_backend. Editors then log in and saves are committed to git.
+
+backend:
+  name: github
+  repo: your-org/antera-docs   # TODO: change to your GitHub owner/repo
+  branch: main
+
+local_backend: true
+
+media_folder: "public/assets/uploads"
+public_folder: "/assets/uploads"
+
+collections:
+  - name: guides
+    label: Guides
+    editor:
+      preview: false
+    files:
+      - name: shipping
+        label: PO Shipping Address Guide
+        file: src/content/shipping-guide.json
+        description: Text shown on the PO Shipping Address guide page.
+        fields:
+          - name: hero
+            label: Header
+            widget: object
+            fields:
+              - { name: title, label: Page title, widget: string }
+              - { name: lead, label: Intro paragraph, widget: markdown }
+          - name: sections
+            label: Sections
+            widget: object
+            fields:
+              - name: start
+                label: "01 How shipping works"
+                widget: object
+                fields:
+                  - { name: lead, label: Lead, widget: markdown }
+                  - { name: info, label: Highlighted callout, widget: markdown }
+                  - { name: body, label: Closing paragraph, widget: markdown }
+              - name: docs
+                label: "02 The three PO documents"
+                widget: object
+                fields:
+                  - { name: lead, label: Lead, widget: markdown }
+                  - { name: note, label: Note callout, widget: markdown }
+              - name: flags
+                label: "03 Settings & flags"
+                widget: object
+                fields:
+                  - { name: lead, label: Lead, widget: markdown }
+              - name: priority
+                label: "04 Priority rules"
+                widget: object
+                fields:
+                  - { name: lead, label: Lead, widget: markdown }
+                  - { name: note, label: Note callout, widget: markdown }
+              - name: tool
+                label: "05 Determination tool"
+                widget: object
+                fields:
+                  - { name: lead, label: Lead, widget: markdown }
+              - name: flows
+                label: "06 Decision flowcharts"
+                widget: object
+                fields:
+                  - { name: lead, label: Lead, widget: markdown }
+              - name: scenarios
+                label: "07 Scenario library"
+                widget: object
+                fields:
+                  - { name: lead, label: Lead, widget: markdown }
+
+      - name: auto-allocation
+        label: Auto Allocation Guide
+        file: src/content/auto-allocation-guide.json
+        description: Text shown on the Auto Allocation guide page.
+        fields:
+          - name: hero
+            label: Header
+            widget: object
+            fields:
+              - { name: title, label: Page title, widget: string }
+              - { name: lead, label: Intro paragraph, widget: markdown }
+          - name: sections
+            label: Sections
+            widget: object
+            fields:
+              - name: start
+                label: "01 How auto-allocation works"
+                widget: object
+                fields:
+                  - { name: lead, label: Lead, widget: markdown }
+                  - { name: info, label: Highlighted callout, widget: markdown }
+                  - { name: body, label: Closing paragraph, widget: markdown }
+              - name: prereq
+                label: "02 Prerequisites"
+                widget: object
+                fields:
+                  - { name: lead, label: Lead, widget: markdown }
+                  - { name: note, label: Note callout, widget: markdown }
+              - name: flags
+                label: "03 Settings & flags"
+                widget: object
+                fields:
+                  - { name: lead, label: Lead, widget: markdown }
+              - name: outcomes
+                label: "04 Allocation outcomes"
+                widget: object
+                fields:
+                  - { name: lead, label: Lead, widget: markdown }
+                  - { name: note, label: Note callout, widget: markdown }
+              - name: warehouse
+                label: "05 Warehouse priority"
+                widget: object
+                fields:
+                  - { name: lead, label: Lead, widget: markdown }
+                  - { name: info, label: Info callout, widget: markdown }
+              - name: parent
+                label: "06 Parent to Child transfer"
+                widget: object
+                fields:
+                  - { name: lead, label: Lead, widget: markdown }
+                  - { name: info, label: Info callout, widget: markdown }
+              - name: tool
+                label: "07 Allocation simulator"
+                widget: object
+                fields:
+                  - { name: lead, label: Lead, widget: markdown }
+              - name: flows
+                label: "08 Decision flowcharts"
+                widget: object
+                fields:
+                  - { name: lead, label: Lead, widget: markdown }

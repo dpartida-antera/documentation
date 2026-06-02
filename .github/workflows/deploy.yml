@@ -1,0 +1,55 @@
+name: Deploy Angular app to GitHub Pages
+
+# This repo (documentation) contains the old static site at the root AND the
+# Angular app in angular-app/. This workflow builds the Angular app from the
+# subfolder and publishes it as the Pages site. Pages "Source" must be set to
+# "GitHub Actions" (Settings -> Pages) for this to take over from the static root.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: angular-app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: angular-app/package-lock.json
+      - run: npm ci
+      - name: Build
+        # repo is "documentation", so Pages serves it under /documentation/.
+        run: npx ng build --configuration production --base-href "/${{ github.event.repository.name }}/"
+      - name: SPA fallback + nojekyll
+        run: |
+          cp dist/antera-docs/browser/index.html dist/antera-docs/browser/404.html
+          touch dist/antera-docs/browser/.nojekyll
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: angular-app/dist/antera-docs/browser
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
