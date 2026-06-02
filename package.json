@@ -8,7 +8,10 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "deploy": "npm run build && wrangler deploy",
-    "preview": "npm run build && wrangler dev"
+    "preview": "npm run build && wrangler dev",
+    "deploy:oauth": "wrangler deploy -c cms-oauth/wrangler.jsonc",
+    "secret:oauth:id": "wrangler secret put GITHUB_CLIENT_ID -c cms-oauth/wrangler.jsonc",
+    "secret:oauth:secret": "wrangler secret put GITHUB_CLIENT_SECRET -c cms-oauth/wrangler.jsonc"
   },
   "private": true,
   "dependencies": {

@@ -24,7 +24,7 @@ Easiest, dashboard route:
 3. Note the worker URL, for example `https://antera-cms-auth.your-subdomain.workers.dev`.
 4. Go back to the GitHub OAuth App and set the **Authorization callback URL** to `<worker-url>/callback`.
 
-(CLI alternative: `npm i -g wrangler`, `wrangler deploy worker.js`, then `wrangler secret put GITHUB_CLIENT_ID` and `wrangler secret put GITHUB_CLIENT_SECRET`.)
+(CLI alternative from repo root: `npm run deploy:oauth`, then `npm run secret:oauth:id` and `npm run secret:oauth:secret`.)
 
 ## 3. Point the CMS at the worker
 

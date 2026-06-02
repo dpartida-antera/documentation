@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "antera-cms-auth",
+  "name": "documentation-app-site",
   "compatibility_date": "2026-06-02",
   "observability": {
     "enabled": true
