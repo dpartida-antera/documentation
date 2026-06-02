@@ -24,8 +24,6 @@ collections:
   - name: guides
     label: Guides
     format: json
-    editor:
-      preview: false
     files:
       - name: shipping
         label: PO Shipping Address Guide

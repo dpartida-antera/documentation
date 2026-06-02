@@ -7,6 +7,85 @@
 </head>
 <body>
   <!-- Decap CMS: friendly editor for the guide text. Loads its config from config.yml. -->
+  <script src="https://unpkg.com/marked@9/marked.min.js"></script>
   <script src="https://unpkg.com/decap-cms@^3.3.3/dist/decap-cms.js"></script>
+  <script>
+    // Preview template shared by both guides (shipping and auto-allocation).
+    // Renders the hero title/lead and each section, with colour-coded callouts:
+    //   info  → blue   (highlighted tip)
+    //   note  → yellow (warning / edge-case)
+    //   body  → green  (closing paragraph)
+    //   lead  → plain text
+    var CALLOUT_BG = { info: '#dbeafe', note: '#fef9c3', body: '#dcfce7' };
+
+    var GuidePreview = createClass({
+      md: function (text) {
+        if (!text) return null;
+        return h('div', { dangerouslySetInnerHTML: { __html: marked.parse(String(text)) } });
+      },
+
+      renderField: function (key, value) {
+        if (!value) return null;
+        var isLead = key === 'lead';
+        var style = isLead
+          ? { margin: '6px 0' }
+          : {
+              background: CALLOUT_BG[key] || '#f3f4f6',
+              padding: '10px 14px',
+              borderRadius: '6px',
+              margin: '8px 0',
+            };
+        return h('div', { key: key, style: style }, this.md(value));
+      },
+
+      render: function () {
+        var self = this;
+        // Convert Immutable record to plain JS once; all nested access is then normal JS.
+        var raw = this.props.entry.get('data');
+        if (!raw) return h('div', {}, 'Loading…');
+        var data = raw.toJS ? raw.toJS() : raw;
+
+        var hero = data.hero || {};
+        var sections = data.sections || {};
+
+        var sectionEls = Object.keys(sections).map(function (secKey) {
+          var sec = sections[secKey] || {};
+          var fields = Object.keys(sec).map(function (fieldKey) {
+            return self.renderField(fieldKey, sec[fieldKey]);
+          });
+          return h('div', { key: secKey, style: { marginBottom: '24px' } },
+            h('h2', {
+              style: {
+                fontSize: '0.75rem', fontWeight: '700', textTransform: 'uppercase',
+                letterSpacing: '0.07em', color: '#6b7280',
+                borderBottom: '1px solid #e5e7eb', paddingBottom: '4px', marginBottom: '8px',
+              }
+            }, secKey),
+            fields
+          );
+        });
+
+        return h('div', {
+          style: {
+            fontFamily: 'system-ui, -apple-system, sans-serif',
+            maxWidth: '700px', margin: '0 auto', padding: '24px',
+            lineHeight: '1.65', color: '#111827',
+          }
+        },
+          hero.title
+            ? h('div', { style: { marginBottom: '32px', paddingBottom: '20px', borderBottom: '2px solid #e5e7eb' } },
+                h('h1', { style: { margin: '0 0 10px', fontSize: '1.5rem', fontWeight: '700' } }, hero.title),
+                this.md(hero.lead)
+              )
+            : null,
+          sectionEls
+        );
+      },
+    });
+
+    // For file collections, Decap matches the preview template by the file's `name` field.
+    CMS.registerPreviewTemplate('shipping', GuidePreview);
+    CMS.registerPreviewTemplate('auto-allocation', GuidePreview);
+  </script>
 </body>
 </html>
