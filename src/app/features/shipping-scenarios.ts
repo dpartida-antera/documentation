@@ -128,5 +128,5 @@ export const SHIPPING_QA_SCENARIOS: QaScenario[] = RAW.map(s => {
   const expected = computed
     ? 'Ships to ' + ADDR[decide(s.doc as ShippingDoc, s.flags as ShippingFlags).a].name
     : (s.manualExpected || '');
-  return { id: s.id, group: SECTIONS[s.sec], title: s.title, cond: s.cond, expected, computed };
+  return { id: s.id, group: SECTIONS[s.sec], title: s.title, cond: s.cond, expected, computed, order: s.order };
 });

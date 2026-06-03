@@ -1,8 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { FlowLayout, FlowSpec, NodeType, PositionedNode } from '../core/models';
-import { layoutFlow } from '../core/flow-layout';
-
-const LH = 13.5;
+import { layoutFlow, LH } from '../core/flow-layout';
 
 @Component({
   selector: 'app-flowchart',

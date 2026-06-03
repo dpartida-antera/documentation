@@ -1,6 +1,7 @@
 import { EdgeSpec, FlowLayout, FlowSpec, NodeSpec, PositionedEdge, PositionedNode, Side } from './models';
 
-const LH = 13.5;
+/** Line height for wrapped text inside flow nodes. Shared with the flowchart renderer. */
+export const LH = 13.5;
 
 export function wrapText(text: string, maxChars: number): string[] {
   const words = text.split(' ');

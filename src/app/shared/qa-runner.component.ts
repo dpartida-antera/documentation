@@ -12,6 +12,8 @@ export interface QaScenario {
   cond: string[];
   expected: string;
   computed: boolean;
+  /** Optional link to the live order this scenario was verified against. */
+  order?: string;
 }
 
 interface Counts { untested: number; pass: number; fail: number; blocked: number; }
@@ -71,6 +73,10 @@ const STATUSES: RunStatus[] = ['untested', 'pass', 'fail', 'blocked'];
     .scn .exp{margin:9px 0 0;font-size:13.5px}
     .scn .exp .lab{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:700;margin-right:6px}
     .scn .exp .live{font-size:10.5px;background:#e7f0fb;color:#2f6fb0;border-radius:5px;padding:1px 6px;font-weight:700;margin-left:7px;vertical-align:middle}
+    .scn .order{margin:9px 0 0;font-size:13px}
+    .scn .order .lab{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:700;margin-right:6px}
+    .scn .order a{color:var(--blue);text-decoration:none;word-break:break-all}
+    .scn .order a:hover{text-decoration:underline}
     .statusbtns{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
     .statusbtns button{border:1px solid var(--line);background:var(--card);padding:7px 14px;border-radius:8px;font-size:12.5px;font-weight:700;color:var(--muted);cursor:pointer}
     .statusbtns button.untested.on{background:#eef1f5;color:#5a6675;border-color:#c3cdd9}
@@ -169,6 +175,9 @@ const STATUSES: RunStatus[] = ['untested', 'pass', 'fail', 'blocked'];
           <div class="top"><div><span class="tid">{{ s.id }}</span> &nbsp;<span class="title">{{ s.title }}</span></div><span class="badge">{{ s.group }}</span></div>
           <div class="cond">@for (c of s.cond; track $index) { <span class="chip">{{ c }}</span> }</div>
           <div class="exp"><span class="lab">Expected</span>{{ s.expected }}@if (s.computed) { <span class="live" title="Computed live from the rules engine">computed</span> }</div>
+          @if (s.order) {
+            <div class="order"><span class="lab">Order</span><a [href]="s.order" target="_blank" rel="noopener noreferrer">{{ s.order }}</a></div>
+          }
           <div class="statusbtns">
             @for (st of statuses; track st) {
               <button [class]="st" [class.on]="rec(s.id).status===st" (click)="setStatus(s.id, st)">{{ label(st) }}</button>
@@ -271,10 +280,10 @@ export class QaRunnerComponent implements OnInit {
 
   /* ---- export / import ---- */
   private buildCsv(results: QaResults): string {
-    const head = ['ID', 'Group', 'Title', 'Conditions', 'Expected', 'Status', 'Notes'];
+    const head = ['ID', 'Group', 'Title', 'Conditions', 'Expected', 'Order', 'Status', 'Notes'];
     const rows = this.scenarios.map(s => {
       const r = results[s.id] || { status: 'untested', notes: '' };
-      return [s.id, s.group, s.title, s.cond.join(' · '), s.expected, r.status, r.notes || ''].map(csvCell).join(',');
+      return [s.id, s.group, s.title, s.cond.join(' · '), s.expected, s.order || '', r.status, r.notes || ''].map(csvCell).join(',');
     });
     return head.join(',') + '\n' + rows.join('\n');
   }

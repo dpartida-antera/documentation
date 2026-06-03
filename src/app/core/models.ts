@@ -51,6 +51,21 @@ export interface PositionedNode extends NodeSpec { h: number; cx: number; cy: nu
 export interface PositionedEdge { x1: number; y1: number; x2: number; y2: number; label?: string; lx: number; ly: number; lw: number; }
 export interface FlowLayout { vb: [number, number]; nodes: PositionedNode[]; edges: PositionedEdge[]; }
 
+/* ---------- Editable guide content ---------- */
+/** One prose section rendered by <app-doc-section>. Shared by the guides and custom pages. */
+export interface DocSection {
+  id: string;
+  heading: string;
+  lead?: string;
+  info?: string;
+  note?: string;
+  body?: string;
+  cards?: Array<{ tag: string; title: string; body: string }>;
+  table_header_col1?: string;
+  table_header_col2?: string;
+  table?: Array<{ col1: string; col2: string }>;
+}
+
 /* ---------- QA runner ---------- */
 export type RunStatus = 'untested' | 'pass' | 'fail' | 'blocked';
 export interface QaRecord { status: RunStatus; notes: string; }
