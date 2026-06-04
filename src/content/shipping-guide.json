@@ -91,7 +91,7 @@
         {
           "tag": "3 · Default",
           "title": "Vendor / Order",
-          "body": "With no overrides, the Supplier PO ships from Vendor and the Decorator PO ships to the Order address."
+          "body": "With no overrides, the Supplier PO ships from Vendor and the Decorator PO ships to the order shipping address."
         }
       ],
       "note": "**Within Ship to Us there is a sub-priority:** Destination Warehouse, then Corporate Identity, then Partner Address. The Destination Warehouse step only applies when the admin setting \"Prioritize Warehouse Address on Ship To Us Toggles\" is On."
