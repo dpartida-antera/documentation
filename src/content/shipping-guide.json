@@ -6,7 +6,7 @@
   },
   "sections": {
     "start": {
-      "heading": "How shipping works, in one minute",
+      "heading": "How shipping works, in one minute ",
       "lead": "Every order is broken into one or more **Purchase Orders (POs)**. Each PO is a document telling one party to send goods somewhere. The system answers a single question for each PO: **what address goes in the Ship To block?**",
       "info": "**The whole system is three inputs feeding one decision.** 1) **Which document** is this (Blank PO, Decorator PO, or Supplier Decorated PO)? 2) **Which flags** are set on the order or product? 3) The system walks a **decision tree** and picks one of seven possible **destination addresses**.",
       "body": "The goal is to route product through the right hands: a blank garment may need to reach a decorator before it reaches the customer; a finished item may go straight to the buyer; sometimes everything routes back to your own warehouse first."
