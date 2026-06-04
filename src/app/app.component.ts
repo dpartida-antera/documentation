@@ -7,7 +7,7 @@ import { RouterLink, RouterOutlet } from '@angular/router';
   imports: [RouterOutlet, RouterLink],
   template: `
     <div class="topbar">
-      <div class="brand"><div class="logo">A</div><b>Antera Documentation</b><span>· Knowledge base</span></div>
+      <a class="brand" routerLink="/"><div class="logo">A</div><b>Antera Documentation</b><span>· Knowledge base</span></a>
       <div class="spacer"></div>
       <a class="barlink" routerLink="/">Home</a>
     </div>
