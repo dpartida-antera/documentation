@@ -13,13 +13,16 @@ import { createIntegration, createComponent } from '@gitbook/runtime';
 
 const EMBED_PATH = '/documentation/embed/';
 
-// Initial aspect ratios so the block does not jump before the widget reports its
-// real height. Kept in sync with scripts/gen-oembed.mjs (width 1040).
+// Aspect ratio (width / height) for each widget's frame. The embed page also posts
+// @webframe.resize to fit its real height, but this is the fallback if a host caps
+// or ignores resize. Lower number = taller frame. shipping-tool and
+// allocation-simulator use the side-by-side (embed-split) layout, so they are wider
+// and shorter; the values lean tall so content never clips.
 const DEFAULT_ASPECT: Record<string, number> = {
-    'shipping-tool': 1040 / 640,
+    'shipping-tool': 1.5,
     'shipping-flows': 1040 / 660,
     'shipping-qa': 1040 / 1000,
-    'allocation-simulator': 1040 / 800,
+    'allocation-simulator': 1.15,
     'allocation-flows': 1040 / 660,
     'allocation-qa': 1040 / 1000,
 };
