@@ -110,19 +110,19 @@ With Share Parent Inventory on, a child that is short on stock can pull inventor
 
 Enter the required and in-stock quantities per size, flip the flags, and see exactly how the line item is rewritten when the order books.
 
-{% embed url="https://dpartida-antera.github.io/documentation/oembed/allocation-simulator.html" %}
+{% embed url="https://dpartida-antera.github.io/documentation/embed/allocation-simulator" %}
 
 ## Decision flowcharts
 
 The same logic, drawn out. Diamonds are checks; green boxes are outcomes.
 
-{% embed url="https://dpartida-antera.github.io/documentation/oembed/allocation-flows.html" %}
+{% embed url="https://dpartida-antera.github.io/documentation/embed/allocation-flows" %}
 
 ## Scenario library & QA runner
 
 Every auto-allocation and parent-transfer scenario as a live, trackable checklist. Expected outcomes are computed by the same rules engine the guide uses, so the sheet can't drift.
 
-{% embed url="https://dpartida-antera.github.io/documentation/oembed/allocation-qa.html" %}
+{% embed url="https://dpartida-antera.github.io/documentation/embed/allocation-qa" %}
 
 ---
 

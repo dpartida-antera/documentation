@@ -60,15 +60,22 @@ export class EmbedComponent implements AfterViewInit, OnDestroy {
     this.widget = route.snapshot.paramMap.get('widget') ?? '';
   }
 
-  // Post the content height to the parent frame so a host that listens can auto-size the iframe.
+  // Report height to the parent so the host can auto-size the iframe. Uses GitBook's
+  // ContentKit webframe protocol (@webframe.ready / @webframe.resize), which is also
+  // harmless on any other host that does not listen for it.
   ngAfterViewInit(): void {
-    if (!isPlatformBrowser(this.platformId) || typeof ResizeObserver === 'undefined') return;
-    const post = () => window.parent?.postMessage(
-      { type: 'antera-embed-size', widget: this.widget, height: document.documentElement.scrollHeight },
-      '*',
-    );
-    this.ro = new ResizeObserver(post);
-    this.ro.observe(document.documentElement);
+    if (!isPlatformBrowser(this.platformId)) return;
+    const send = (action: Record<string, unknown>) => window.parent?.postMessage({ action }, '*');
+    send({ action: '@webframe.ready' });
+    const post = () => {
+      const height = document.documentElement.scrollHeight;
+      const width = document.documentElement.clientWidth || height;
+      send({ action: '@webframe.resize', size: { aspectRatio: width / height, height } });
+    };
+    if (typeof ResizeObserver !== 'undefined') {
+      this.ro = new ResizeObserver(post);
+      this.ro.observe(document.documentElement);
+    }
     post();
   }
 

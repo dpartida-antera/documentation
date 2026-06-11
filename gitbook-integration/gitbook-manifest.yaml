@@ -1,0 +1,32 @@
+# GitBook ContentKit integration that renders the Antera embed widgets as live,
+# interactive webframes (GitBook will not inline arbitrary iframes via URL embed,
+# so this integration is the supported path).
+#
+# Before publishing: set `organization` to your GitBook org id or subdomain
+# (GitBook > Organization settings > the value in the URL / settings).
+name: antera-docs-widgets
+title: Antera Documentation Widgets
+description: Embed the live Antera QA/Support tools (determination tool, allocation simulator, flowcharts, QA runners) inside GitBook pages.
+summary: |
+    # Overview
+
+    Renders the interactive tools from the Antera Documentation app as live, interactive embeds inside GitBook.
+
+    # How it works
+
+    Paste any widget URL (https://dpartida-antera.github.io/documentation/embed/...) into a GitBook page and it becomes a live, interactive webframe. The frame auto-sizes to the tool's height.
+
+    # Widgets
+
+    shipping-tool, shipping-flows, shipping-qa, allocation-simulator, allocation-flows, allocation-qa.
+organization: fO6XkE4lj9ajYUYk8v00
+visibility: private
+script: ./src/index.tsx
+scopes: []
+target: space
+blocks:
+    - id: embed
+      title: Antera widget
+      description: Live interactive Antera documentation tool
+      urlUnfurl:
+          - https://dpartida-antera.github.io/documentation/embed/**

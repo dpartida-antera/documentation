@@ -1,0 +1,20 @@
+{
+  "name": "antera-docs-widgets-integration",
+  "version": "0.1.0",
+  "private": true,
+  "description": "GitBook ContentKit integration that embeds the Antera documentation widgets as live webframes.",
+  "dependencies": {
+    "@gitbook/api": "*",
+    "@gitbook/runtime": "*"
+  },
+  "devDependencies": {
+    "@gitbook/cli": "*",
+    "@gitbook/tsconfig": "*",
+    "typescript": "^5.4.0"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "check": "gitbook check",
+    "publish-integration": "gitbook publish ."
+  }
+}
