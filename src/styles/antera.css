@@ -178,3 +178,8 @@ code{background:#eef1f5;border:1px solid #e0e5ec;border-radius:5px;padding:1px 6
   .hub-hero,.hub-main{padding-left:22px;padding-right:22px}
   .topbar{padding-left:18px;padding-right:18px}
 }
+
+/* Embed: keep the determination tool split left/right even in a narrow iframe
+   (overrides the mobile single-column collapse above). */
+.embed-split .tool{grid-template-columns:1fr 1fr}
+.embed-split .tool .controls{border-right:1px solid var(--line);border-bottom:none}

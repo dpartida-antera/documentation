@@ -18,6 +18,8 @@ import { ALLOCATION_QA_SCENARIOS } from './allocation-scenarios';
 @Component({
   selector: 'app-embed',
   standalone: true,
+  // Keep the shipping determination tool side-by-side (not stacked) inside narrow frames.
+  host: { '[class.embed-split]': "widget === 'shipping-tool'" },
   imports: [DeterminationToolComponent, AllocationSimulatorComponent, QaRunnerComponent, FlowTabsComponent],
   styles: [`
     :host{display:block;padding:18px;max-width:1040px;margin:0 auto}
