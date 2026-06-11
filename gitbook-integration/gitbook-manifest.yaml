@@ -6,7 +6,7 @@
 # (GitBook > Organization settings > the value in the URL / settings).
 name: antera-docs-widgets
 title: Antera Documentation Widgets
-description: Embed the live Antera QA/Support tools (determination tool, allocation simulator, flowcharts, QA runners) inside GitBook pages.
+description: Embed the live Antera QA and Support tools inside GitBook pages.
 summary: |
     # Overview
 
