@@ -60,19 +60,19 @@ When more than one flag is set, the system resolves conflicts in a fixed order. 
 
 Pick a document, flip the flags as they appear on the order, and the tool shows the exact destination, its data source, and the fields you should see in the address block.
 
-{% embed url="https://dpartida-antera.github.io/documentation/embed/shipping-tool" %}
+{% embed url="https://dpartida-antera.github.io/documentation/oembed/shipping-tool.html" %}
 
 ## Decision flowcharts
 
 The same logic the tool uses, drawn out. Diamonds are flag checks; green boxes are destinations.
 
-{% embed url="https://dpartida-antera.github.io/documentation/embed/shipping-flows" %}
+{% embed url="https://dpartida-antera.github.io/documentation/oembed/shipping-flows.html" %}
 
 ## Scenario library & QA runner
 
 Worked examples of intended behavior as a live, trackable checklist. Expected results are computed by the same rules engine the guide uses, so the sheet can never drift. Search, filter, and save runs.
 
-{% embed url="https://dpartida-antera.github.io/documentation/embed/shipping-qa" %}
+{% embed url="https://dpartida-antera.github.io/documentation/oembed/shipping-qa.html" %}
 
 ## Glossary
 

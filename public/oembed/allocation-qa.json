@@ -1,0 +1,10 @@
+{
+  "version": "1.0",
+  "type": "rich",
+  "provider_name": "Antera Documentation",
+  "provider_url": "https://dpartida-antera.github.io/documentation/",
+  "title": "Auto Allocation QA runner",
+  "width": 1040,
+  "height": 1000,
+  "html": "<iframe src=\"https://dpartida-antera.github.io/documentation/embed/allocation-qa\" width=\"1040\" height=\"1000\" style=\"border:0;max-width:100%\" title=\"Auto Allocation QA runner\" loading=\"lazy\"></iframe>"
+}

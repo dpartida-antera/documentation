@@ -1,0 +1,10 @@
+{
+  "version": "1.0",
+  "type": "rich",
+  "provider_name": "Antera Documentation",
+  "provider_url": "https://dpartida-antera.github.io/documentation/",
+  "title": "Address determination tool",
+  "width": 1040,
+  "height": 640,
+  "html": "<iframe src=\"https://dpartida-antera.github.io/documentation/embed/shipping-tool\" width=\"1040\" height=\"640\" style=\"border:0;max-width:100%\" title=\"Address determination tool\" loading=\"lazy\"></iframe>"
+}

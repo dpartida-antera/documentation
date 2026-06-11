@@ -1,0 +1,10 @@
+{
+  "version": "1.0",
+  "type": "rich",
+  "provider_name": "Antera Documentation",
+  "provider_url": "https://dpartida-antera.github.io/documentation/",
+  "title": "Shipping decision flowcharts",
+  "width": 1040,
+  "height": 660,
+  "html": "<iframe src=\"https://dpartida-antera.github.io/documentation/embed/shipping-flows\" width=\"1040\" height=\"660\" style=\"border:0;max-width:100%\" title=\"Shipping decision flowcharts\" loading=\"lazy\"></iframe>"
+}
