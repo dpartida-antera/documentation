@@ -1,3 +1,28 @@
 {
-  "pages": []
+  "pages": [
+    {
+      "slug": "New Documentation example",
+      "title": "New Documentation example",
+      "subtitle": "Subtitle here",
+      "hero": {
+        "title": "New Documentation example",
+        "lead": "New Documentation example blah blah blah"
+      },
+      "sections": [
+        {
+          "id": "12345",
+          "heading": "New Section",
+          "lead": "This is the lead paragraph\n\n\n\n![](/assets/uploads/lord_icon_wolverine.webp)",
+          "body": "This is the body paragraph",
+          "cards": [
+            {
+              "tag": "card1",
+              "title": "card1",
+              "body": "card1 body"
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }

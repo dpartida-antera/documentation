@@ -182,9 +182,98 @@
       },
     });
 
+    // Custom pages have a different shape: a `pages` array, each page with a hero
+    // and an ordered `sections` array (matching DocSectionComponent in the app).
+    var CustomPagesPreview = createClass({
+      md: function (text) {
+        if (!text) return null;
+        return h('div', { dangerouslySetInnerHTML: { __html: marked.parse(String(text)) } });
+      },
+
+      renderCards: function (cards) {
+        if (!Array.isArray(cards) || !cards.length) return null;
+        var self = this;
+        return h('div', { style: S.cardGrid },
+          cards.map(function (card, i) {
+            return h('div', { key: i, style: S.card },
+              card.tag   ? h('span', { style: S.tag },       card.tag)   : null,
+              card.title ? h('div',  { style: S.cardTitle }, card.title) : null,
+              card.body  ? self.md(card.body)                            : null
+            );
+          })
+        );
+      },
+
+      renderTable: function (rows, h1, h2) {
+        if (!Array.isArray(rows) || !rows.length) return null;
+        var self = this;
+        return h('table', { style: S.table },
+          h('thead', {}, h('tr', {},
+            h('th', { style: S.th }, h1 || 'Item'),
+            h('th', { style: S.th }, h2 || 'Details')
+          )),
+          h('tbody', {},
+            rows.map(function (row, i) {
+              return h('tr', { key: i },
+                h('td', { style: S.td }, h('b', {}, row.col1 || '')),
+                h('td', { style: S.td }, self.md(row.col2))
+              );
+            })
+          )
+        );
+      },
+
+      // Render one section in the same order the app's DocSectionComponent uses:
+      // heading, lead, info (blue), cards, table, note (yellow), body.
+      renderSection: function (sec, key) {
+        return h('div', { key: key, style: S.section },
+          sec.heading ? h('h3', { style: S.heading }, sec.heading) : null,
+          sec.lead ? h('div', { style: S.lead }, this.md(sec.lead)) : null,
+          sec.info ? h('div', { style: { background: CALLOUT_BG.info, padding: '10px 14px', borderRadius: '6px', margin: '8px 0' } }, this.md(sec.info)) : null,
+          this.renderCards(sec.cards),
+          this.renderTable(sec.table, sec.table_header_col1, sec.table_header_col2),
+          sec.note ? h('div', { style: { background: CALLOUT_BG.note, padding: '10px 14px', borderRadius: '6px', margin: '8px 0' } }, this.md(sec.note)) : null,
+          sec.body ? h('div', { style: { background: CALLOUT_BG.body, padding: '10px 14px', borderRadius: '6px', margin: '8px 0' } }, this.md(sec.body)) : null
+        );
+      },
+
+      renderPage: function (page, key) {
+        var self = this;
+        var hero = page.hero || {};
+        var sections = Array.isArray(page.sections) ? page.sections : [];
+        return h('div', { key: key, style: { marginBottom: '40px', paddingBottom: '24px', borderBottom: '2px dashed #e5e7eb' } },
+          h('div', { style: S.divider },
+            page.slug ? h('div', { style: S.label }, '/guide/' + page.slug) : null,
+            h('h1', { style: { margin: '0 0 10px', fontSize: '1.5rem', fontWeight: '700' } }, hero.title || page.title || 'Untitled page'),
+            this.md(hero.lead),
+            hero.pill ? h('span', { style: S.pill }, hero.pill) : null
+          ),
+          sections.map(function (sec, i) { return self.renderSection(sec || {}, 'sec-' + i); }),
+          page.footer ? h('div', { style: S.footer }, page.footer) : null
+        );
+      },
+
+      render: function () {
+        var self = this;
+        var raw = this.props.entry.get('data');
+        if (!raw) return h('div', {}, 'Loading…');
+        var data = raw.toJS ? raw.toJS() : raw;
+        var pages = Array.isArray(data.pages) ? data.pages : [];
+
+        return h('div', {
+          style: { fontFamily: 'system-ui, -apple-system, sans-serif', maxWidth: '720px', margin: '0 auto', padding: '24px', lineHeight: '1.65', color: '#111827' }
+        },
+          pages.length
+            ? pages.map(function (page, i) { return self.renderPage(page || {}, 'page-' + i); })
+            : h('div', { style: S.subtitle }, 'No pages yet. Add one to see a preview.')
+        );
+      },
+    });
+
     // For file collections, Decap matches the preview template by the file's `name` field.
     CMS.registerPreviewTemplate('shipping', GuidePreview);
     CMS.registerPreviewTemplate('auto-allocation', GuidePreview);
+    CMS.registerPreviewTemplate('custom-pages', CustomPagesPreview);
   </script>
 </body>
 </html>
